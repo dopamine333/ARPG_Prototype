@@ -10,8 +10,11 @@ from Scripts.GameLoop.InputProcessor import InputProcessor
 from Scripts.Managers.MouseManager import MouseManager
 from Scripts.Managers.PhysicsManager import PhysicsManager
 
+
 class GameLoop:
     def __init__(self) -> None:
+        pygame.init()
+
         self.screen = pygame.display.set_mode((1280, 720))
         self.screen_size = Vector2(self.screen.get_size())
         self.clock = pygame.time.Clock()

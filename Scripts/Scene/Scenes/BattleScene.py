@@ -1,16 +1,18 @@
+import pygame
+from time import time
 import Scripts.Scene.Scenes.MainMenuScene
 from Scripts.Scene.Scenes.Scene import Scene
-from Scripts.Managers.EventManager import Event,EventManager
+from Scripts.Managers.EventManager import EventManager
+
 
 class BattleScene(Scene):
-    def start(self):
-        print("Battle Time start!!!")
-        EventManager.attach(Event.end_Battle,self.to_mainmenu)  
+    def init(self):
+        self.start_time = time()
 
-    def end(self):
-        print("battle end!")
-        EventManager.detach(Event.end_Battle,self.to_mainmenu)  
+    def update(self):
+        print(f"battling !! {time()-self.start_time}")
+        if(time()-self.start_time > 10):
+            self.to_mainmenu()
 
     def to_mainmenu(self):
-        print("go to mainmenu !!!")
         self.change_scene(Scripts.Scene.Scenes.MainMenuScene.MainMenuScene)
