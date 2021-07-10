@@ -12,6 +12,13 @@ from pygame.image import load
 
 
 class MouseManager(Singleton):
+    '''
+    A manager of mouse,
+
+    can swicth cursor image by mouse state and
+
+    trigger buttons which was attached
+    '''
     def __init__(self) -> None:
         self.buttons: list[Button] = []
         self.cursor_state = CursorState.normal
@@ -35,12 +42,12 @@ class MouseManager(Singleton):
         mouse_pressed = mouse.get_pressed()[0]
         for button in self.buttons:
             button.check(mouse_pos, mouse_pressed)
-        self.update_cursor()
-        self.cursor_state = CursorState.normal
-
-    def update_cursor(self):
+        #update_cursor    
         image = self.cursor_images[self.cursor_state]
         mouse.set_cursor(image.get_int_center(), image.source)
+
+        self.cursor_state = CursorState.normal
+        
 
     def mouse_over_buttom(self):
         self.cursor_state = CursorState.button

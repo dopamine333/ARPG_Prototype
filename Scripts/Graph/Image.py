@@ -4,6 +4,9 @@ from pygame.math import Vector2
 
 
 class Image:
+    """
+    A class which can store the center of a surface.
+    """
     def __init__(self, source: Surface, center: Vector2 = None) -> None:
         self.source = source
         if not center:
@@ -12,11 +15,14 @@ class Image:
 
     def offset(self, position: Vector2) -> Vector2:
         """
-        return the topleft 
+        Return the topleft coordinate,
 
-        when the center of image on the position
+        when the center of image on the position.
         """
         return position-self.center
 
-    def get_int_center(self):
+    def get_int_center(self)-> tuple[int, int]:
+        """
+        Convert the center type to tuple[int,int].
+        """
         return (round(self.center.x), round(self.center.y))
