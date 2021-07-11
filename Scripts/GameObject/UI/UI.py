@@ -1,7 +1,8 @@
+from Scripts.Locals import Layer
 from Scripts.Graph.Image import Image
 from pygame import Vector2
 from Scripts.GameObject.GameObject import GameObject
-from Scripts.Graph.Camera import Camera
+from Scripts.Graph.Render import Render
 
 
 class UI(GameObject):
@@ -10,5 +11,5 @@ class UI(GameObject):
         self.UI_position = UI_position
         self.image = image
 
-    def draw(self, camera: Camera):
-        camera.draw_UI(self.image, self.UI_position)
+    def draw(self, render: Render):
+        render.draw(self.image, self.UI_position,Layer.UI)

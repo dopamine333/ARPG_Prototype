@@ -42,8 +42,7 @@ class EventManager:
         if not event in EventManager.events:
             return
         for func in EventManager.events[event]:
-            print(func.__code__.co_varnames, func.__code__.co_argcount)
             if func.__code__.co_argcount == 0 or func.__code__.co_varnames == ('self',):
                 func()
             else:
-                func(args_of_func)
+                func(*args_of_func)

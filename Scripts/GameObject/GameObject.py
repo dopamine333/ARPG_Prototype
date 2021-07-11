@@ -1,5 +1,5 @@
 
-from Scripts.Graph.Camera import Camera
+from Scripts.Graph.Render import Render
 from Scripts.Graph.Image import Image
 import pygame
 from pygame import Vector3
@@ -18,5 +18,5 @@ class GameObject:
     def update(self):
         pass
 
-    def draw(self, camera: Camera):
+    def draw(self, render: Render):
         pass

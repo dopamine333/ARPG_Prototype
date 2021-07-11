@@ -20,17 +20,12 @@ class MainMenuScene(Scene):
             r"Arts\MainMenu\game_title.png").convert_alpha()
         game_title = UI(Image(game_title_source), (640, 200))
 
-        self.play_button.attach(ButtonEvent.down, self.to_battle)
+        self.play_button.attach(ButtonEvent.up, self.to_battle)
 
         self.add_gameobjects(self.play_button, game_title)
 
-    def start(self):
-        print("ssss")
-        return super().start()
-
     def release(self):
-        self.play_button.detach(ButtonEvent.down, self.to_battle)
+        self.play_button.detach(ButtonEvent.up, self.to_battle)
 
     def to_battle(self):
-        print("MainMenuScene:go to battle!")
         self.change_scene(Scripts.Scene.Scenes.BattleScene.BattleScene)

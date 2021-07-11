@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     # The TYPE_CHECKING constant is always False at runtime
     # but type-checking tools will evaluate the contents of that block.
     from Scripts.Scene.Scenes.Scene import Scene
-    from Scripts.Graph.Camera import Camera
+    from Scripts.Graph.Render import Render
 
 
 class SceneChanger:
@@ -15,12 +15,11 @@ class SceneChanger:
         if self.current_scene:
             self.current_scene.update()
 
-    def draw(self, camera: Camera):
+    def draw(self, render: Render):
         if self.current_scene:
-            self.current_scene.draw(camera)
+            self.current_scene.draw(render)
 
     def change(self, new_scene: Scene):
-        print(f"f {self.current_scene} t {new_scene}")
         if self.current_scene:
             self.current_scene.end()
             self.current_scene.release()

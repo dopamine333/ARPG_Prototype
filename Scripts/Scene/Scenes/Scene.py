@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     # The TYPE_CHECKING constant is always False at runtime
     # but type-checking tools will evaluate the contents of that block.
-    from Scripts.Graph.Camera import Camera
+    from Scripts.Graph.Render import Render
     from Scripts.Scene.SceneChanger import SceneChanger
     from Scripts.GameObject.GameObject import GameObject
 
@@ -38,9 +38,9 @@ class Scene:
         for gameobject in self.gameobjects:
             gameobject.update()
 
-    def draw(self, camera: Camera):
+    def draw(self, render: Render):
         for gameobject in self.gameobjects:
-            gameobject.draw(camera)
+            gameobject.draw(render)
 
     def change_scene(self, new_scene_name: type[Scene]):
         self.scene_changer.change(new_scene_name(self.scene_changer))

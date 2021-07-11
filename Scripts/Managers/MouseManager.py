@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
-from pygame.cursors import Cursor
 if TYPE_CHECKING:
     from Scripts.GameObject.UI.Button import Button
+
+from pygame.cursors import Cursor
 from Scripts.Graph.Image import Image
 from pygame import Vector2, mouse
 from Scripts.Locals import ButtonEvent, CursorState

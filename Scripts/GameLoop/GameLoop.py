@@ -1,3 +1,4 @@
+from Scripts.Graph.Render import Render
 import pygame
 import pygame.display
 import pygame.time
@@ -20,7 +21,7 @@ class GameLoop:
         self.clock = pygame.time.Clock()
 
         self.input_processor = InputProcessor()
-        self.camare = Camera(self.screen)
+        self.render = Render(self.screen)
         self.scene_changer = SceneChanger()
 
     def run(self):
@@ -42,11 +43,10 @@ class GameLoop:
         self.input_processor.process(event)
 
     def draw(self):
-        self.scene_changer.draw(self.camare)
-        self.camare.draw()
+        self.scene_changer.draw(self.render)
+        self.render.render()
 
     def update(self):
         MouseManager.Instance().update()
         PhysicsManager.Instance().update()
         self.scene_changer.update()
-        self.camare.update()
