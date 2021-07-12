@@ -1,4 +1,5 @@
 from __future__ import annotations
+from time import time
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.GameObject.UI.Button import Button
@@ -27,7 +28,8 @@ class MouseManager(Singleton):
             CursorState.button: Image(
                 load(r"Arts\Cursors\button_cursor.png").convert_alpha(), (28.5, 8.3))
         }
-
+        self.invisible_timer=0
+        self.invisible_time=3
     def attach(self, button: Button):
         self.buttons.append(button)
         button.attach(ButtonEvent.over, self.mouse_over_buttom)
@@ -40,6 +42,12 @@ class MouseManager(Singleton):
     def update(self):
         mouse_pos = mouse.get_pos()
         mouse_pressed = mouse.get_pressed()[0]
+        if mouse.get_rel()==(0,0):
+            if self.invisible_timer+self.invisible_time<time():
+                mouse.set_visible(False)
+                self.invisible_timer=time()
+        else:
+            mouse.set_visible(True)
         for button in self.buttons:
             button.check(mouse_pos, mouse_pressed)
         #update_cursor    

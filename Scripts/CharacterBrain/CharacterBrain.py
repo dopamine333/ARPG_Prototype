@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.GameObject.Sprite.Character.Character import Character
 
-#TODO 完成CharacterBrain的類別圖
 class CharacterBrain:  
     def __init__(self) -> None:
         self.character: Character = None

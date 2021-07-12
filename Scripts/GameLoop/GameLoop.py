@@ -48,5 +48,4 @@ class GameLoop:
 
     def update(self):
         MouseManager.Instance().update()
-        PhysicsManager.Instance().update()
         self.scene_changer.update()

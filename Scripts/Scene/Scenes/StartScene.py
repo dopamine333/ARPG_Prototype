@@ -5,6 +5,7 @@ from Scripts.Managers.EventManager import EventManager
 
 class StartScene(Scene):
     def start(self):
+        super().start()
         self.to_mainmenu()
 
     def to_mainmenu(self):

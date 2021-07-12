@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Physics.RigidBody import RigidBody
+    from Scripts.Physics.Collision import Collision
 
 from Scripts.Graph.Image import Image
 from pygame import Vector3
@@ -31,5 +32,5 @@ class Sprite(GameObject):
     def end(self):
         super().end()
         self.rigidbody.end()
-
-    #TODO 新增碰撞事件介面(OnCollisionEnter,OnCollisionStay,OnCollisionExit)
+    def collide(self,collision:Collision):
+        pass

@@ -21,7 +21,7 @@ class Camera:
         self.world_to_screen_matrix:list[Vector2] = [
             Vector2(1, 0),  # x
             Vector2(0, -1),  # y
-            Vector2(0, -0.4)  # z
+            Vector2(0, -0.5)  # z
         ]
         
 
@@ -46,28 +46,27 @@ class Camera:
             position = self.world_to_screen(order.position,layer.get_height())
             topleft = order.image.offset(position)
             sprite_layer.blit(source, topleft)
-
-            shadow_position=order.position.xyz
-            shadow_position.y=0
-
-            # 在shadow_layer層上畫出橢圓形的shadow
-            shadow_size_on_screen=\
-                order.shadow_size.x*self.world_to_screen_matrix[0]+\
-                Vector2(0,order.shadow_size.y*self.world_to_screen_matrix[2].y)
-            shadow_size_on_screen.x=abs(shadow_size_on_screen.x)
-            shadow_size_on_screen.y=abs(shadow_size_on_screen.y)
-            shadow_rect = Rect(
-                (0, 0),
-                shadow_size_on_screen
-            )
-            shadow_rect.center = self.world_to_screen(shadow_position,layer.get_height())
-            ellipse(shadow_layer, self.shadow_color, shadow_rect)
+            if order.shadow_size:
+                shadow_position=order.position.xyz
+                shadow_position.y=0
+                # 在shadow_layer層上畫出橢圓形的shadow
+                shadow_size_on_screen=\
+                    order.shadow_size.x*self.world_to_screen_matrix[0]+\
+                    Vector2(0,order.shadow_size.y*self.world_to_screen_matrix[2].y)
+                shadow_size_on_screen.x=abs(shadow_size_on_screen.x)
+                shadow_size_on_screen.y=abs(shadow_size_on_screen.y)
+                shadow_rect = Rect(
+                    (0, 0),
+                    shadow_size_on_screen
+                )
+                shadow_rect.center = self.world_to_screen(shadow_position,layer.get_height())
+                ellipse(shadow_layer, self.shadow_color, shadow_rect)
 
         layer.blit(shadow_layer,(0,0))
         layer.blit(sprite_layer,(0,0))
 
 
-    def draw(self, image: Image, position: Vector3, shadow_size: Vector2):
+    def draw(self, image: Image, position: Vector3, shadow_size: Vector2=None):
         self.sprite_orders.insert(DrawSpriteOrder(image, position, shadow_size))
 
     def world_to_screen(self, world_position: Vector3,screen_height:float):

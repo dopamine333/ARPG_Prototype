@@ -1,20 +1,20 @@
-from enum import Enum
+from enum import Enum,auto
+from os import remove
 
 
 GRAVITY=-2
 class GameEvent(Enum):
     '''this is event type and this type is Enum'''
-    press_down_space = 0
-    start_Battle = 1
-    end_Battle = 2
+    add_gameobject=0
+    remove_gameobject=1
 class InputEvent(Enum):
     key_down=6
     w=0
     a=1
     s=2
     d=3
-    j=4
-    k=5
+    jump=4
+    fire=5
 
 
 class Layer(Enum):
@@ -22,9 +22,9 @@ class Layer(Enum):
     由上畫到下的
     environment->sprite->UI
     '''
-    environment = 1
-    sprite = 2
-    UI = 3
+    environment = auto()
+    sprite = auto()
+    UI = auto()
 
 
 class ButtonEvent(Enum):

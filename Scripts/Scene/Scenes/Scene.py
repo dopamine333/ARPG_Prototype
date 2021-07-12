@@ -8,6 +8,9 @@ if TYPE_CHECKING:
     from Scripts.Scene.SceneChanger import SceneChanger
     from Scripts.GameObject.GameObject import GameObject
 
+from Scripts.Locals import GameEvent
+from Scripts.Managers.EventManager import EventManager
+
 
 class Scene:
     def __init__(self, scene_changer: SceneChanger) -> None:
@@ -27,10 +30,16 @@ class Scene:
         pass
 
     def start(self):
+        EventManager.attach(GameEvent.add_gameobject, self.add_gameobjects)
+        EventManager.attach(GameEvent.remove_gameobject,
+                            self.remove_gameobject)
         for gameobject in self.gameobjects:
             gameobject.start()
 
     def end(self):
+        EventManager.detach(GameEvent.add_gameobject, self.add_gameobjects)
+        EventManager.detach(GameEvent.remove_gameobject,
+                            self.remove_gameobject)
         for gameobject in self.gameobjects:
             gameobject.end()
 

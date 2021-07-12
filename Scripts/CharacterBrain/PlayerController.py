@@ -25,23 +25,9 @@ class PlayerController(CharacterBrain):
             self.character.move(movement)
 
     def handle(self,key:InputEvent):
-        if key==InputEvent.j:
+        if key==InputEvent.jump:
             self.character.jump()
-        if key==InputEvent.k:
+        if key==InputEvent.fire:
             self.character.attack()
-        '''#region handle move
-        if key == InputEvent.w:
-            self.character.move(Vector2(0,1))
-            return
-        if key == InputEvent.s:
-            self.character.move(Vector2(0,-1))
-            return
-        if key == InputEvent.a:
-            self.character.move(Vector2(-1,0))
-            return
-        if key == InputEvent.d:
-            self.character.move(Vector2(1,0))
-            return
-        #endregion
-        '''
+        
 

@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Physics.Collider import Collider
 
+from Scripts.Physics.Collision import Collision
 from Scripts.Managers.PhysicsManager import PhysicsManager
 from Scripts.Locals import Face, GRAVITY
 from pygame import Vector3
@@ -25,7 +26,7 @@ class RigidBody:
         self.horizontal_max_speed = math.inf
         self.horizontal_max_speed_squared = math.inf
         self.damp = 1
-
+    #TODO 移動最高速度而不是水平最高速度
     def set_horizontal_max_speed(self, horizontal_max_speed):
         self.horizontal_max_speed = horizontal_max_speed
         self.horizontal_max_speed_squared = horizontal_max_speed**2
@@ -45,7 +46,6 @@ class RigidBody:
 
     def end(self):
         PhysicsManager.Instance().detach(self)
-
     def update(self):
         if self.apply_gravity:
             self.acceleration.y += GRAVITY
@@ -58,6 +58,8 @@ class RigidBody:
             self.velocity.xz=vxz
         self.position += self.velocity
         self.acceleration.xyz = (0, 0, 0)
+
+        PhysicsManager.Instance().check(self)
 
     def add_force(self, force: Vector3):
         self.acceleration += force
@@ -75,13 +77,16 @@ class RigidBody:
         collider_surface = self.collider.get_surface(face)
         if face == Face.up:
             self.position.y = value-collider_surface
-        if face == Face.down:
-            self.position.y = value+collider_surface
-        if face == Face.right:
+        elif face == Face.down:
+            self.position.y = value-collider_surface
+        elif face == Face.right:
             self.position.x = value-collider_surface
-        if face == Face.left:
-            self.position.x = value+collider_surface
-        if face == Face.front:
+        elif face == Face.left:
+            self.position.x = value-collider_surface
+        elif face == Face.front:
             self.position.z = value-collider_surface
-        if face == Face.back:
-            self.position.z = value+collider_surface
+        elif face == Face.back:
+            self.position.z = value-collider_surface
+
+    def collide(self,collision:Collision):
+        self.sprite.collide(collision)
