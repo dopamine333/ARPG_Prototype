@@ -3,14 +3,17 @@ from pygame import Vector3
 
 
 class Collider:
-    def __init__(self,center:Vector3,size:Vector3) -> None:
-        self.center = center
-        self.size = size
+    '''剛體(RigidBody)的碰撞箱'''
+
+    def __init__(self, size: Vector3, center: Vector3) -> None:
+        self.size = Vector3(size)
+        self.center = Vector3(center)
 
     def get_size(self):
         return self.size
 
     def get_surface(self, face: Face):
+        '''回傳碰撞箱(Collider)不同面的座標'''
         if face == Face.up:
             return self.size.y-self.center.y
         if face == Face.down:

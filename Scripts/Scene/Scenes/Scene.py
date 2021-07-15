@@ -1,55 +1,56 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    # The TYPE_CHECKING constant is always False at runtime
-    # but type-checking tools will evaluate the contents of that block.
-    from Scripts.Graph.Render import Render
-    from Scripts.Scene.SceneChanger import SceneChanger
     from Scripts.GameObject.GameObject import GameObject
-
-from Scripts.Locals import GameEvent
-from Scripts.Managers.EventManager import EventManager
+from Scripts.Scene.SceneManager import SceneManager
 
 
 class Scene:
-    def __init__(self, scene_changer: SceneChanger) -> None:
-        self.scene_changer = scene_changer
+    '''
+    呼叫場景上所有的遊戲物件(GameObject)更新
+
+    若要新增場景則繼承此類
+    '''
+
+    def __init__(self) -> None:
         self.gameobjects: list[GameObject] = []
+        self.to_del_gameobjects: list[GameObject] = []
+
+    def add_gameobject(self, gameobject: GameObject):
+        self.gameobjects.append(gameobject)
 
     def add_gameobjects(self, *gameobjects: list[GameObject]):
         self.gameobjects.extend(gameobjects)
 
     def remove_gameobject(self, gameobject: GameObject):
-        self.gameobjects.remove(gameobject)
+        self.to_del_gameobjects.append(gameobject)
 
-    def init(self):
+    def scene_start(self):
+        '''在start前執行'''
         pass
 
-    def release(self):
+    def scene_update(self):
+        '''在update前執行'''
+        pass
+
+    def scene_end(self):
+        '''在end後執行'''
         pass
 
     def start(self):
-        EventManager.attach(GameEvent.add_gameobject, self.add_gameobjects)
-        EventManager.attach(GameEvent.remove_gameobject,
-                            self.remove_gameobject)
         for gameobject in self.gameobjects:
             gameobject.start()
 
     def end(self):
-        EventManager.detach(GameEvent.add_gameobject, self.add_gameobjects)
-        EventManager.detach(GameEvent.remove_gameobject,
-                            self.remove_gameobject)
         for gameobject in self.gameobjects:
             gameobject.end()
 
     def update(self):
         for gameobject in self.gameobjects:
             gameobject.update()
-
-    def draw(self, render: Render):
-        for gameobject in self.gameobjects:
-            gameobject.draw(render)
+        for del_gameobject in self.to_del_gameobjects:
+            self.gameobjects.remove(del_gameobject)
+        self.to_del_gameobjects.clear()
 
     def change_scene(self, new_scene_name: type[Scene]):
-        self.scene_changer.change(new_scene_name(self.scene_changer))
+        SceneManager.change(new_scene_name())

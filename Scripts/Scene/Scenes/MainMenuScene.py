@@ -1,31 +1,42 @@
-from Scripts.Locals import ButtonEvent
-from Scripts.GameObject.UI.UI import UI
+from Scripts.Button.MouseManager import MouseManager
+from Scripts.Graphic.Render.Render import Render
+from Scripts.GameObject.GameObject import GameObject
+from Scripts.Button.Button import Button
+from Scripts.Graphic.Image import Image
+from Scripts.Locals import ButtonEvent, Layer
 from pygame.image import load
-from Scripts.Graph.Image import Image
-from Scripts.GameObject.UI.Button import Button
 import Scripts.Scene.Scenes.BattleScene
 from Scripts.Scene.Scenes.Scene import Scene
-from Scripts.Managers.EventManager import EventManager
 
 
 class MainMenuScene(Scene):
-    def init(self):
+    def scene_start(self):
+
         play_button_source = load(
             r"Arts\MainMenu\play_button.png").convert_alpha()
-        play_button_rect = play_button_source.get_rect()
-        play_button_rect.center = (640, 400)
-        self.play_button = Button(Image(play_button_source), play_button_rect)
+        play_button_size = play_button_source.get_size()
+        play_button = GameObject()
+        play_button_render = play_button.add_component(Render)
+        play_button_button = play_button.add_component(Button)
+        play_button_render.set_image(Image(play_button_source))
+        play_button_render.set_layer(Layer.UI)
+        play_button_button.set_button_size(play_button_size)
+        play_button.set_position((640, 400, 0))
 
         game_title_source = load(
             r"Arts\MainMenu\game_title.png").convert_alpha()
-        game_title = UI(Image(game_title_source), (640, 200))
+        game_title = GameObject()
+        game_title_render: Render = game_title.add_component(Render)
+        game_title_render.set_image(Image(game_title_source))
+        game_title_render.set_layer(Layer.UI)
+        game_title.set_position((640, 200, 0))
 
-        self.play_button.attach(ButtonEvent.up, self.to_battle)
+        play_button_button.attach(ButtonEvent.up, self.to_battle)
 
-        self.add_gameobjects(self.play_button, game_title)
+        self.add_gameobjects(play_button, game_title)
 
-    def release(self):
-        self.play_button.detach(ButtonEvent.up, self.to_battle)
+    def scene_update(self):
+        MouseManager.update()
 
     def to_battle(self):
         self.change_scene(Scripts.Scene.Scenes.BattleScene.BattleScene)

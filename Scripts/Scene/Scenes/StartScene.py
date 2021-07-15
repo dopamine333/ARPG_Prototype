@@ -1,6 +1,5 @@
 from Scripts.Scene.Scenes.MainMenuScene import MainMenuScene
 from Scripts.Scene.Scenes.Scene import Scene
-from Scripts.Managers.EventManager import EventManager
 
 
 class StartScene(Scene):

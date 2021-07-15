@@ -3,14 +3,17 @@ from pygame import Vector3
 
 
 class Box:
-    def __init__(self,center:Vector3,size:Vector3) -> None:
-        self.center = Vector3 (center)
-        self.size = Vector3( size)
+    '''描述三維空間中的一個長方體'''
+
+    def __init__(self, size: Vector3, center: Vector3) -> None:
+        self.size = Vector3(size)
+        self.center = Vector3(center)
 
     def get_size(self):
         return self.size
 
     def get_surface(self, face: Face):
+        '''回傳碰撞箱(Collider)不同面的座標'''
         if face == Face.up:
             return self.center.y+self.size.y/2
         if face == Face.down:

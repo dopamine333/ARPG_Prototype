@@ -1,3 +1,6 @@
+from typing import Callable
+
+
 class Node:
     def __init__(self, item):
         self.item = item
@@ -6,11 +9,18 @@ class Node:
 
 
 class BinaryTree:
-    def __init__(self, get_value_func=None):
+    '''排序二元樹'''
+
+    def __init__(self, key: Callable = lambda item: item):
+        '''
+        key是從存入的東西中
+
+        取的要比較的值的方法
+
+        預設是直接回傳存入的東西
+        '''
         self.root = None
-        self.value = get_value_func
-        if not self.value:
-            self.value=lambda item:item
+        self.value = key
 
     def insert(self, item):
         # 判斷tree是否為空
@@ -32,34 +42,33 @@ class BinaryTree:
             else:
                 self._insert(item, cur_node.right_child)
 
-
     def get_list(self):
         if self.root != None:
             return self._get_list(self.root)
         return []
+
     def _get_list(self, cur_node) -> list:
         if cur_node != None:
-            return self._get_list(cur_node.left_child) +\
-                [cur_node.item] +\
-                self._get_list(cur_node.right_child)
+            return [*self._get_list(cur_node.left_child),
+                    cur_node.item,
+                    *self._get_list(cur_node.right_child)]
         return []
-    def clear(self):
-        self.root=None
 
-if __name__ =="__main__":
+    def clear(self):
+        self.root = None
+
+
+if __name__ == "__main__":
 
     class test_item:
         def __init__(self, x, y) -> None:
             self.xy = (x, y)
 
-
     def get_x(item: test_item):
         return item.xy[0]
 
-
     def get_y(item: test_item):
         return item.xy[1]
-
 
     def fill_tree(tree, num_elems=10, max_int=50):
         from random import randint

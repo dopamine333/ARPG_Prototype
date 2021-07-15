@@ -1,70 +1,96 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Physics.Collider import Collider
+    from Scripts.Physics.Collision import Collision
 
-from Scripts.Physics.Collision import Collision
-from Scripts.Managers.PhysicsManager import PhysicsManager
-from Scripts.Locals import Face, GRAVITY
+from Scripts.Physics.Physics import Physics
+from Scripts.GameObject.Component import Component
+from Scripts.Locals import Face, ForceMode, GRAVITY
 from pygame import Vector3
-from Scripts.GameObject.Sprite.Sprite import Sprite
-import pygameEngine
-import math
 
-#TODO 完成RigidBody的類別圖
+# TODO 完成RigidBody的類別圖
 
-class RigidBody:
-    def __init__(self, collider: Collider, apply_gravity: bool = True) -> None:
-        self.collider = collider
-        self.sprite: Sprite = None
 
-        self.position = Vector3()
+class RigidBody(Component):
+    '''
+    負責與Physics溝通的組件(Component)
+
+    實現物理效果，並提供註冊的碰撞時呼叫某些方法的功能。
+
+    屬性:
+        -collider: Collider
+        -damp: float = 1
+        -apply_gravity: bool = True
+        -frozen: bool = False
+    '''
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.collider: Collider = None
+        self.apply_gravity = True
+        self.damp = 1
+        self.frozen = False
+
         self.velocity = Vector3()
         self.acceleration = Vector3()
 
-        self.apply_gravity = apply_gravity
-        self.horizontal_max_speed = math.inf
-        self.horizontal_max_speed_squared = math.inf
-        self.damp = 1
-    #TODO 移動最高速度而不是水平最高速度
-    def set_horizontal_max_speed(self, horizontal_max_speed):
-        self.horizontal_max_speed = horizontal_max_speed
-        self.horizontal_max_speed_squared = horizontal_max_speed**2
+        self.on_collide_notify: list[Callable] = []
+
+    # region setter
+
+    def set_collider(self, collider: Collider):
+        self.collider = collider
+
+    def set_frozen(self, frozen: bool):
+        self.frozen = frozen
 
     def set_damp(self, damp: float):
         self.damp = damp
 
-    def set_sprite(self, sprite: Sprite):
-        self.sprite = sprite
-        self.position = sprite.get_position()
+    def set_apply_gravity(self, apply_gravity: bool):
+        self.frozapply_gravityen = apply_gravity
 
-    def get_collider(self):
-        return self.collider
+    # endregion
 
     def start(self):
-        PhysicsManager.Instance().attach(self)
+        Physics.attach(self)
 
     def end(self):
-        PhysicsManager.Instance().detach(self)
-    def update(self):
-        if self.apply_gravity:
-            self.acceleration.y += GRAVITY
+        Physics.detach(self)
 
+    def update(self):
+        # 更新物理
+        if self.frozen:
+            self.velocity *= 0
+            return
+        if self.apply_gravity:
+            self.add_force(GRAVITY, ForceMode.force)
         self.velocity += self.acceleration
         self.velocity *= self.damp
-        if self.velocity.xz.length_squared() > self.horizontal_max_speed_squared:
-            vxz=self.velocity.xz
-            vxz.scale_to_length(self.horizontal_max_speed)
-            self.velocity.xz=vxz
-        self.position += self.velocity
+        self.position += self.velocity*Physics.get_deltatime()  # 時間校正
         self.acceleration.xyz = (0, 0, 0)
 
-        PhysicsManager.Instance().check(self)
+        # 檢查碰撞
+        Physics.check(self)
 
-    def add_force(self, force: Vector3):
-        self.acceleration += force
+    def add_force(self, force: Vector3, force_mode: ForceMode = ForceMode.force):
+        '''
+        根據力種類不同選擇不同的力的模式(ForceMode)
+
+        使在不同幀率(FPS)維持穩定的物理行為
+
+        ForceMode.force   ->  施加一個持續的力時選擇
+
+        ForceMode.impulse ->  施加一個瞬間的力時選擇
+        '''
+        if force_mode == ForceMode.force:
+            self.acceleration += force*Physics.get_deltatime()  # 時間校正
+        if force_mode == ForceMode.impulse:
+            self.acceleration += force
 
     def get_surface(self, face: Face):
+        '''回傳碰撞箱(Collider)不同面的座標'''
         collider_surface = self.collider.get_surface(face)
         if face == Face.up or face == Face.down:
             return collider_surface+self.position.y
@@ -74,6 +100,7 @@ class RigidBody:
             return collider_surface+self.position.z
 
     def set_surface(self, face: Face, value: float):
+        '''設定碰撞箱(Collider)不同面的座標，並改變位置(position)'''
         collider_surface = self.collider.get_surface(face)
         if face == Face.up:
             self.position.y = value-collider_surface
@@ -88,5 +115,26 @@ class RigidBody:
         elif face == Face.back:
             self.position.z = value-collider_surface
 
-    def collide(self,collision:Collision):
-        self.sprite.collide(collision)
+    def on_collide(self, collision: Collision):
+        self.notify(collision)
+
+    def attach(self, func: Callable):
+        '''
+        註冊碰撞時想被通知的方法
+
+        該方法應有一個碰撞資訊類別(Collision)的參數
+
+        參考: def on_collide(collision: Collision)
+        '''
+        self.on_collide_notify.append(func)
+
+    def detach(self, func: Callable):
+        '''取消註冊碰撞時想被通知的方法'''
+        if not func in self.on_collide_notify:
+            raise Exception("detach the unkwon func!")
+        self.on_collide_notify.remove(func)
+
+    def notify(self, collision: Collision):
+        '''通知註冊了碰撞事件的所有方法，並傳入碰撞資訊(Collision)'''
+        for func in self.on_collide_notify:
+            func(collision)
