@@ -58,6 +58,7 @@ class Layer(Enum):
     environment = auto()
     sprite = auto()
     UI = auto()
+    gizmo=auto
 
 
 class ButtonEvent(Enum):

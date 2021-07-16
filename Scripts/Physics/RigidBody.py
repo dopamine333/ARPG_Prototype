@@ -9,7 +9,6 @@ from Scripts.GameObject.Component import Component
 from Scripts.Locals import Face, ForceMode, GRAVITY
 from pygame import Vector3
 
-# TODO 完成RigidBody的類別圖
 
 
 class RigidBody(Component):

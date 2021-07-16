@@ -1,11 +1,12 @@
 from __future__ import annotations
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from Scripts.Camera.Camera import Camera
 from pygame.time import Clock
-from Scripts.Camera.Camera import Camera
 from Scripts.Locals import Layer
 from Scripts.Graphic.Image import Image
 import pygame
-from pygame import Surface, Vector2
+from pygame import Surface, Vector2, Vector3
 
 
 class RenderManager:
@@ -25,6 +26,7 @@ class RenderManager:
     @staticmethod
     def set_camera(camera: Camera):
         RenderManager.camera = camera
+        camera.view_rect.size = RenderManager.screen.get_size()
 
     @staticmethod
     def render():
@@ -42,7 +44,7 @@ class RenderManager:
 
     @staticmethod
     def draw(image: Image, position: Vector2, layer: Layer):
-        '''輸入圖片、位子、圖層，將圖片畫在該圖層上'''
+        '''輸入圖片、位置、圖層，將圖片畫在該圖層上'''
         RenderManager.get_layer(layer).blit(
             image.source, image.offset(position))
 

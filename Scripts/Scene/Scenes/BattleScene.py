@@ -1,3 +1,4 @@
+from Scripts.Camera.CameraController import CameraController
 from Scripts.Button.MouseManager import MouseManager
 from Scripts.Physics.Physics import Physics
 from Scripts.Button.Button import Button
@@ -17,7 +18,7 @@ import pygame
 from time import time
 import Scripts.Scene.Scenes.MainMenuScene
 from Scripts.Scene.Scenes.Scene import Scene
-from pygame import Surface
+from pygame import Rect, Surface
 from random import random
 from Scripts.Character.CharacterBrain.PlayerController import PlayerController
 from Scripts.Character.CharacterBrain.SlimeBrain import SlimeBrain
@@ -26,8 +27,7 @@ from Scripts.Graphic.Render.SpriteRender import SpriteRender
 
 class BattleScene(Scene):
     def scene_start(self):
-        self.start_time = time()
-
+        # region hero
         hero_image = Image(
             load(r"Arts\Character\hero.png").convert_alpha(), (25, 123))
         hero = GameObject()
@@ -41,7 +41,9 @@ class BattleScene(Scene):
         hero.set_position((720, 100, 720))
         hero.set_tag(Tag.player)
         self.add_gameobject(hero)
+        # endregion
 
+        # region slime
         slime_image = Image(
             load(r"Arts\Character\slime.png").convert_alpha(), (40, 40))
         for _ in range(15):
@@ -59,7 +61,9 @@ class BattleScene(Scene):
             slime.set_tag(Tag.enemy)
 
             self.add_gameobject(slime)
+        # endregion
 
+        # region obstacle
         for _ in range(8):
             size = random()*150+50
             obstacle_source = Surface(
@@ -76,6 +80,9 @@ class BattleScene(Scene):
             obstacle.set_position((random()*1280, 0, random()*1280))
 
             self.add_gameobject(obstacle)
+        # endregion
+        
+        # region to_mainmenu_button
 
         to_mainmenu_button_source = load(
             r"Arts\BattleMenu\to_mainmenu.png").convert_alpha()
@@ -90,8 +97,23 @@ class BattleScene(Scene):
 
         to_mainmenu_button_button.attach(ButtonEvent.up, self.to_mainmenu)
         self.add_gameobject(to_mainmenu_button)
+        # endregion
 
-        RenderManager.set_camera(Camera())
+        #region camera
+        camera=GameObject()
+        camera_camera=camera.add_component(Camera)
+        camera_controller=camera.add_component(CameraController)
+        camera_controller.set_target(hero)
+        camera_controller.set_follow_axis(y=False)
+        camera_controller.set_offset((0,100,-100))
+        camera_camera.set_activity_rect(Rect(-500,-500,2000,2000))
+        camera_camera.set_shadow_color((10,10,50,50))
+        self.add_gameobject(camera)
+        #endregion
+
+
+
+        RenderManager.set_camera(camera_camera)
         Physics.set_activity_box(Box((1280, 720, 1280), (640, 360, 640)))
 
     def scene_update(self):

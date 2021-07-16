@@ -1,16 +1,12 @@
 from __future__ import annotations
+from Scripts.Graphic.RenderManager import RenderManager
+from pygame import Color, mouse
 from Scripts.GameObject.Component import Component
-from math import cos, sin
-from time import time
-from pygame import mouse
-from pygame import transform
-from pygame.draw import ellipse
-from pygame.transform import rotate
-from Scripts.Locals import Layer
+from pygame.draw import ellipse,rect
 from Scripts.Graphic.Image import Image
 import pygame
 from pygame import Rect, Surface, Vector2, Vector3
-from Scripts.Tools.BinaryTree import BinaryTree, Node
+from Scripts.Tools.BinaryTree import BinaryTree
 
 
 class Camera(Component):
@@ -22,26 +18,46 @@ class Camera(Component):
 
     def __init__(self) -> None:
         super().__init__()
-        # self.position=Vector3()
-        self.shadow_color = (20, 20, 30, 20)
+        self.shadow_color = (20, 20, 40, 20)
         self.sprite_orders = BinaryTree(DrawSpriteOrder.get_comparison_value)
         self.world_to_screen_matrix: list[Vector2] = [
             Vector2(1, 0),  # x
             Vector2(0, -1),  # y
             Vector2(0, -0.5)  # z
         ]
+        self.view_rect = Rect(0, 0, 0, 0)
+        self.activity_rect: Rect = None
+
+
+    def start(self):
+        self.update_view_rect()
+
+    def update_view_rect(self):
+        self.view_rect.center = self.world_to_screen(
+            self.position, self.view_rect.height)
+        if self.activity_rect:
+            self.view_rect.clamp_ip(self.activity_rect)
+
+
+    def set_activity_rect(self, activity_rect: Rect):
+        self.activity_rect = activity_rect
+    def set_shadow_color(self, shadow_color: Color):
+        self.shadow_color= shadow_color
+
 
     def update(self):
-        # TODO 相機跟隨玩家
-        '''mouse_pos=Vector2(mouse.get_pos())
+        mouse_pos=Vector2( mouse.get_pos())
         x=(mouse_pos.x/1280)-0.5
         y=mouse_pos.y/720
-        self.world_to_screen_matrix[2].xy=Vector2(x,-y)'''
+        self.world_to_screen_matrix[2].xy=Vector2(x,-y)
 
     def render(self, layer: Surface):
         '''將二元樹儲存的訂單畫在輸入的圖層上'''
+        self.update_view_rect()
+
         sprite_layer = layer.copy()
         shadow_layer = layer.copy()
+
         # 將二元樹sprite_orders根據z軸由遠排到近(大排到小)
         orders: list[DrawSpriteOrder] = self.sprite_orders.get_list()
         self.sprite_orders.clear()
@@ -50,7 +66,7 @@ class Camera(Component):
             # 在sprite_layer層上畫出sprite
             source = order.image.source
             position = self.world_to_screen(order.position, layer.get_height())
-            topleft = order.image.offset(position)
+            topleft = order.image.offset(position)-self.view_rect.topleft
             sprite_layer.blit(source, topleft)
 
             # 在shadow_layer層上畫出橢圓形的shadow
@@ -69,6 +85,8 @@ class Camera(Component):
                 )
                 shadow_rect.center = self.world_to_screen(
                     shadow_position, layer.get_height())
+                shadow_rect.top -= self.view_rect.top
+                shadow_rect.left -= self.view_rect.left
                 ellipse(shadow_layer, self.shadow_color, shadow_rect)
 
         layer.blit(shadow_layer, (0, 0))
