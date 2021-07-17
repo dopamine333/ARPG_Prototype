@@ -1,3 +1,6 @@
+from Scripts.Animation.Transition import Transition
+from Scripts.Animation.Animation import Animation
+from pygame.transform import scale
 from Scripts.Camera.CameraController import CameraController
 from Scripts.Button.MouseManager import MouseManager
 from Scripts.Physics.Physics import Physics
@@ -10,7 +13,7 @@ from Scripts.Graphic.Image import Image
 from Scripts.Camera.Camera import Camera
 from Scripts.Graphic.RenderManager import RenderManager
 from Scripts.Physics.Box import Box
-from Scripts.Locals import ButtonEvent, Face, Layer, Tag
+from Scripts.Locals import ButtonEvent, Face, Layer, PlayMode, Tag
 from Scripts.Physics.Collider import Collider
 from Scripts.Physics.RigidBody import RigidBody
 from pygame.image import load
@@ -23,37 +26,80 @@ from random import random
 from Scripts.Character.CharacterBrain.PlayerController import PlayerController
 from Scripts.Character.CharacterBrain.SlimeBrain import SlimeBrain
 from Scripts.Graphic.Render.SpriteRender import SpriteRender
-
-
+from Scripts.Animation.Animator import Animator
+from os.path import join
 class BattleScene(Scene):
     def scene_start(self):
         # region hero
         hero_image = Image(
-            load(r"Arts\Character\hero.png").convert_alpha(), (25, 123))
+            load( r"Arts\Character\hero.png").convert_alpha(), (25, 123))
+        hero_animations:dict[str,Animation]={}
+        acts=["Dead","Idle","Jump","Run"]
+        for act in acts:
+            clip=[]
+            for i in range(1,16):
+                clip.append(Image(
+                scale(load(f"Arts\Character\hero\{act} ({i}).png"),(150, 150)).convert_alpha(), (30, 140)))
+            a=Animation()
+            a.set_clip(clip)
+            a.set_speed(0.5)
+            hero_animations[act]=a
         hero = GameObject()
         hero_hero = hero.add_component(Hero)
         hero_rigidbody = hero.add_component(RigidBody)
         hero_render = hero.add_component(SpriteRender)
-        hero_rigidbody.set_collider(Collider((50, 123, 50), (25, 0, 25)))
+        hero_animator=hero.add_component(Animator)
+        hero_animator.add_animations(*hero_animations.values())
+        hero_animator.set_default_animation(hero_animations["Idle"])
+        hero_animations["Dead"].attach(14,hero.destroy)
+        hero_animator.add_bool("running","on_ground","dead")
+        hero_animations["Idle"].set_play_mode(PlayMode.loop)
+        hero_animations["Jump"].set_play_mode(PlayMode.once)
+        hero_animations["Run"].set_play_mode(PlayMode.loop)
+        hero_animations["Dead"].set_play_mode(PlayMode.once)
+        hero_animations["Idle"].add_transition(Transition(hero_animations["Run"],False).add_condition(("running",True)))
+        hero_animations["Idle"].add_transition(Transition(hero_animations["Jump"],False).add_condition(("on_ground",False)))
+        hero_animations["Jump"].add_transition(Transition(hero_animations["Idle"],False).add_condition(("on_ground",True)))
+        hero_animations["Run"].add_transition(Transition(hero_animations["Idle"],False).add_condition(("running",False)))
+        hero_animations["Run"].add_transition(Transition(hero_animations["Jump"],False).add_condition(("on_ground",False)))
+        hero_animations["Idle"].add_transition(Transition(hero_animations["Dead"],False).add_condition(("dead",True)))
+        hero_animations["Jump"].add_transition(Transition(hero_animations["Dead"],False).add_condition(("dead",True)))
+        hero_animations["Run"].add_transition(Transition(hero_animations["Dead"],False).add_condition(("dead",True)))
+        hero_rigidbody.set_collider(Collider((40, 120, 40), (20, 0, 20)))
         hero_hero.set_brain(PlayerController())
-        hero_render.set_image(hero_image)
-        hero_render.set_shadow_size((50, 50))
+        hero_render.set_shadow_size((40, 40))
         hero.set_position((720, 100, 720))
         hero.set_tag(Tag.player)
         self.add_gameobject(hero)
         # endregion
-
+ 
         # region slime
         slime_image = Image(
             load(r"Arts\Character\slime.png").convert_alpha(), (40, 40))
+        slime_sprite_sheet = scale( load("Arts\Character\slime\Slime_Sprite_Sheet.png"),(687, 510)).convert_alpha()
         for _ in range(15):
             slime = GameObject()
             slime_rigidbody = slime.add_component(RigidBody)
             slime_slime = slime.add_component(Slime)
             slime_render = slime.add_component(SpriteRender)
-            slime_render.set_image(slime_image)
-            slime_render.set_shadow_size((60, 60))
-            slime_rigidbody.set_collider(Collider((60, 30, 60), (30, 0, 30)))
+            slime_animator=slime.add_component(Animator)
+            idle= Animation()
+            jump= Animation()
+            slime_animator.add_animations(idle,jump)
+            slime_animator.set_default_animation(idle)
+            slime_animator.add_trigger("jump")
+            #TODO 新增讓動畫播完自動轉換的功能
+            slime_animator.add_bool("true")
+            slime_animator.set_bool("true",True)
+            idle.use_sprite_sheet(slime_sprite_sheet,(21,105),(54,63),(27,45),3)
+            jump.use_sprite_sheet(slime_sprite_sheet,(20,24),(64,72),(30,69),9)
+            idle.set_speed(0.2)
+            jump.set_speed(0.2)
+            idle.set_play_mode(PlayMode.loop)
+            idle.add_transition(Transition(jump,False).add_condition(("jump",True)))
+            jump.add_transition(Transition(idle,True).add_condition(("true",True)))
+            slime_render.set_shadow_size((40, 40))
+            slime_rigidbody.set_collider(Collider((40, 30, 40), (30, 0, 30)))
             slime.set_position((random()*1280, random()*400, random()*1280))
             slime_brain = SlimeBrain()
             slime_brain.set_target(hero)

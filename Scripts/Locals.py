@@ -46,7 +46,10 @@ class Tag(Enum):
     default = auto()
     player = auto()
     enemy = auto()
-
+class PlayMode(Enum):
+    once=0
+    loop=1
+    pingpong=2
 
 class Layer(Enum):
     '''

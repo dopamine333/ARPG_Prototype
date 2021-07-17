@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pygame import Vector3
 from Scripts.Locals import Tag
-from Scripts.GameObject.GameObject import GameObject
+from Scripts.GameObject.GameObject import GameObject,ComponentType
 
 
 class Component:
@@ -20,11 +20,11 @@ class Component:
         self.gameobject: GameObject = None
         self.position: Vector3 = None
 
-    def add_component(self, component_type):
+    def add_component(self, component_type:ComponentType)->ComponentType:
         '''新增並回傳一個組件(Component)，並與此組件的遊戲物件綁定'''
         return self.gameobject.add_component(component_type)
 
-    def get_component(self, component_type):
+    def get_component(self, component_type:ComponentType)->ComponentType:
         '''回傳一個在此組件的遊戲物件上其他組件(Component)，如果該組件的類別為輸入類別或輸入的子類'''
         return self.gameobject.get_component(component_type)
 

@@ -47,7 +47,6 @@ class CameraController(Component):
         self.position.xyz = self.target.position+self.offset
 
     def update(self):
-
         if self.target:
             old_position = self.position.xyz
             self.position.xyz=self.position.lerp(self.target.position+self.offset, self.follow_speed)

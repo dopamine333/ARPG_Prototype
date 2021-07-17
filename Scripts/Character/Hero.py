@@ -1,9 +1,11 @@
+from Scripts.Graphic.Render.SpriteRender import SpriteRender
+from Scripts.Physics.Collision import Collision
+from Scripts.Animation.Animator import Animator
 from Scripts.Physics.Physics import Physics
 from Scripts.Graphic.Image import Image
 from Scripts.Graphic.RenderManager import RenderManager
 from Scripts.Character.Character import Character
 from random import random
-from pygame import image
 import pygame
 from Scripts.Attack.AttackParam import AttackParam
 from Scripts.Locals import Face, Layer, Tag
@@ -31,6 +33,25 @@ class Hero(Character):
         self.sword_flash_image = Image(sword_flash_source, Vector2(45, 44))
         self.sword_flash_box_size = Vector3(100, 60, 100)
         self.sword_flash_offset = Vector3(100, 60, 0)
+
+        self.animator = self.get_component(Animator)
+        self.render= self.get_component(SpriteRender)
+
+    def jump(self):
+        super().jump()
+
+    def update(self):
+        super().update()
+        self.animator.set_bool("on_ground", self.on_ground)
+        if self.rigidbody.acceleration.length_squared()<1:
+            self.animator.set_bool("running", False)
+        else:
+            self.animator.set_bool("running", True)
+        self.render.set_face(self.face)
+        #print(self.animator.current_animation.frame)
+    
+    def dead(self):
+        self.animator.set_bool("dead",True)
 
     def attack(self):
         force = self.sword_force.xyz

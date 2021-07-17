@@ -41,7 +41,7 @@ class GameLoop:
         while running:
             # 固定幀率(Frame Per Second; fps)為60
             self.clock.tick(60)
-            # print(self.clock.get_fps())
+            #print(self.clock.get_fps())
             self.update()
             self.draw()
             pygame.display.update()

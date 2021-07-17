@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 if TYPE_CHECKING:
     from Scripts.GameObject.Component import Component
 
@@ -8,7 +8,7 @@ from Scripts.Locals import Tag
 from pygame import Vector3
 from Scripts.Scene.SceneManager import SceneManager
 
-
+ComponentType=TypeVar("ComponentType")
 class GameObject:
     '''
     場景上所有東西皆為遊戲物件(GameObject)和組件(Component)的結合
@@ -49,7 +49,7 @@ class GameObject:
         for component in self.components:
             component.update()
 
-    def add_component(self, component_type):
+    def add_component(self, component_type:ComponentType)->ComponentType:
         '''新增並回傳一個組件(Component)，並與此遊戲物件綁定'''
         component = component_type()
         component.gameobject = self
@@ -57,7 +57,7 @@ class GameObject:
         self.components.append(component)
         return component
 
-    def get_component(self, component_type):
+    def get_component(self, component_type:ComponentType)->ComponentType:
         '''回傳一個組件(Component)，如果該組件的類別為輸入類別或輸入的子類'''
         for component in self.components:
             if isinstance(component, component_type):

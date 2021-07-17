@@ -1,7 +1,7 @@
 import pygame
 from pygame import Surface, Vector3
 from pygame.math import Vector2
-
+import pygame.transform
 
 class Image:
     """
@@ -26,3 +26,10 @@ class Image:
         將中心座標轉型成整數數組(tuple[int,int])
         """
         return (round(self.center.x), round(self.center.y))
+    def flip(self,x_flip:bool,y_flip:bool):
+        new_center=self.center.xy
+        if x_flip:
+            new_center.x=self.source.get_width()-self.center.x
+        if y_flip:
+            new_center.y=self.source.get_height()-self.center.y
+        return Image( pygame.transform.flip(self.source,x_flip,y_flip),new_center)

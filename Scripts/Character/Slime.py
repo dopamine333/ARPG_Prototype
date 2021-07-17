@@ -1,4 +1,5 @@
 
+from Scripts.Animation.Animator import Animator
 from enum import Flag
 from Scripts.Locals import Face, ForceMode, Tag
 from Scripts.Character.Character import Character
@@ -22,6 +23,7 @@ class Slime(Character):
 
         super().start()
         self.rigidbody.damp = 0.93
+        self.animator:Animator = self.get_component(Animator)
 
     def move(self, direction: Vector2):
         if self.jump_cd+self.last_jump < time() and self.on_ground:
@@ -31,6 +33,8 @@ class Slime(Character):
             direction.scale_to_length(self.move_speed)
             force = Vector3(direction.x, self.jump_force, direction.y)
             self.rigidbody.add_force(force, ForceMode.impulse)
+            self.animator.set_trigger("jump")
+            print(self.animator.current_animation.frame)
 
     def on_collide(self, collision: Collision):
         super().on_collide(collision)

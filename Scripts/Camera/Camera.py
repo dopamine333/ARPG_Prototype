@@ -46,6 +46,8 @@ class Camera(Component):
 
 
     def update(self):
+        #鏡頭轉動效果 測試用
+        return
         mouse_pos=Vector2( mouse.get_pos())
         x=(mouse_pos.x/1280)-0.5
         y=mouse_pos.y/720

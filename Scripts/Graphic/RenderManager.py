@@ -26,7 +26,8 @@ class RenderManager:
     @staticmethod
     def set_camera(camera: Camera):
         RenderManager.camera = camera
-        camera.view_rect.size = RenderManager.screen.get_size()
+        if camera:
+            camera.view_rect.size = RenderManager.screen.get_size()
 
     @staticmethod
     def render():
