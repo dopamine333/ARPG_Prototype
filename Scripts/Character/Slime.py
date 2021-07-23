@@ -34,7 +34,6 @@ class Slime(Character):
             force = Vector3(direction.x, self.jump_force, direction.y)
             self.rigidbody.add_force(force, ForceMode.impulse)
             self.animator.set_trigger("jump")
-            print(self.animator.current_animation.frame)
 
     def on_collide(self, collision: Collision):
         super().on_collide(collision)

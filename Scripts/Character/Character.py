@@ -41,6 +41,7 @@ class Character(Component):
         self.brain: CharacterBrain = None
 
         self.jump_force = 10
+        self.dash_force=10
         self.move_speed = 1
         self.face = Face.right
         self.max_hp = 10
@@ -70,6 +71,13 @@ class Character(Component):
 
     def attack(self):
         pass
+
+    def dash(self):
+        direction=self.rigidbody.velocity
+        if direction.length_squared()<1:
+            return
+        direction.scale_to_length(self.dash_force)
+        self.rigidbody.add_force(direction, ForceMode.impulse)
 
     def under_attack(self, attack_param: AttackParam):
         self.rigidbody.add_force(attack_param.force, ForceMode.impulse)

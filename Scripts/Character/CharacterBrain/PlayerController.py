@@ -15,6 +15,7 @@ class PlayerController(CharacterBrain):
         EventManager.attach(InputEvent.move_left, self.move_left)
         EventManager.attach(InputEvent.fire, self.attack)
         EventManager.attach(InputEvent.jump, self.jump)
+        EventManager.attach(InputEvent.dash, self.dash)
 
     def end(self):
         EventManager.detach(InputEvent.move_down, self.move_down)
@@ -23,6 +24,7 @@ class PlayerController(CharacterBrain):
         EventManager.detach(InputEvent.move_left, self.move_left)
         EventManager.detach(InputEvent.fire, self.attack)
         EventManager.detach(InputEvent.jump, self.jump)
+        EventManager.detach(InputEvent.dash, self.dash)
 
     def move_up(self):
         self.character.move(Vector2(0, 1))
@@ -38,6 +40,8 @@ class PlayerController(CharacterBrain):
 
     def jump(self):
         self.character.jump()
+    def dash(self):
+        self.character.dash()
 
     def attack(self):
         self.character.attack()

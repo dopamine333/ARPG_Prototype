@@ -33,7 +33,7 @@ class RigidBody(Component):
 
         self.velocity = Vector3()
         self.acceleration = Vector3()
-
+        self.surfaces:dict[Face,float]={}
         self.on_collide_notify: list[Callable] = []
 
     # region setter
@@ -54,6 +54,7 @@ class RigidBody(Component):
 
     def start(self):
         Physics.attach(self)
+        self.update_surface(Face.all)
 
     def end(self):
         Physics.detach(self)
@@ -69,6 +70,8 @@ class RigidBody(Component):
         self.velocity *= self.damp
         self.position += self.velocity*Physics.get_deltatime()  # 時間校正
         self.acceleration.xyz = (0, 0, 0)
+
+        self.update_surface(Face.all)
 
         # 檢查碰撞
         Physics.check(self)
@@ -88,31 +91,39 @@ class RigidBody(Component):
         if force_mode == ForceMode.impulse:
             self.acceleration += force
 
+    def update_surface(self, face: Face):
+        if face==Face.all:
+            self.surfaces[Face.up]=self.collider.get_surface(Face.up)+self.position.y
+            self.surfaces[Face.down]=self.collider.get_surface(Face.down)+self.position.y
+            self.surfaces[Face.front]=self.collider.get_surface(Face.front)+self.position.z
+            self.surfaces[Face.back]=self.collider.get_surface(Face.back)+self.position.z
+            self.surfaces[Face.right]=self.collider.get_surface(Face.right)+self.position.x
+            self.surfaces[Face.left]=self.collider.get_surface(Face.left)+self.position.x
+        else:
+            if face in Face.rightleft:
+                self.surfaces[Face.right]=self.collider.get_surface(Face.right)+self.position.x
+                self.surfaces[Face.left]=self.collider.get_surface(Face.left)+self.position.x
+            elif face in Face.updown:
+                self.surfaces[Face.up]=self.collider.get_surface(Face.up)+self.position.y
+                self.surfaces[Face.down]=self.collider.get_surface(Face.down)+self.position.y
+            elif face in Face.frontback:
+                self.surfaces[Face.front]=self.collider.get_surface(Face.front)+self.position.z
+                self.surfaces[Face.back]=self.collider.get_surface(Face.back)+self.position.z
+
     def get_surface(self, face: Face):
         '''回傳碰撞箱(Collider)不同面的座標'''
-        collider_surface = self.collider.get_surface(face)
-        if face == Face.up or face == Face.down:
-            return collider_surface+self.position.y
-        if face == Face.right or face == Face.left:
-            return collider_surface+self.position.x
-        if face == Face.back or face == Face.front:
-            return collider_surface+self.position.z
+        return self.surfaces[face]
 
     def set_surface(self, face: Face, value: float):
         '''設定碰撞箱(Collider)不同面的座標，並改變位置(position)'''
         collider_surface = self.collider.get_surface(face)
-        if face == Face.up:
-            self.position.y = value-collider_surface
-        elif face == Face.down:
-            self.position.y = value-collider_surface
-        elif face == Face.right:
+        if face in Face.rightleft:
             self.position.x = value-collider_surface
-        elif face == Face.left:
-            self.position.x = value-collider_surface
-        elif face == Face.front:
+        elif face in Face.frontback:
             self.position.z = value-collider_surface
-        elif face == Face.back:
-            self.position.z = value-collider_surface
+        elif face in Face.updown:
+            self.position.y = value-collider_surface
+        self.update_surface(face)
 
     def on_collide(self, collision: Collision):
         self.notify(collision)

@@ -1,3 +1,6 @@
+from random import uniform
+
+from pygame import mouse
 from Scripts.Button.MouseManager import MouseManager
 from Scripts.Locals import InputEvent
 import pygame
@@ -48,7 +51,13 @@ class InputManager:
                 EventManager.notify(InputEvent.jump)
             if event.key == pygame.K_k:
                 EventManager.notify(InputEvent.jump)
+            if event.key == pygame.K_l:
+                EventManager.notify(InputEvent.dash)
             if event.key == pygame.K_p:
                 EventManager.notify(InputEvent.change_collision_type)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            EventManager.notify(InputEvent.fire)
+            pressed=mouse.get_pressed()
+            if pressed[0]:
+                EventManager.notify(InputEvent.fire)
+            if pressed[2]:
+                EventManager.notify(InputEvent.dash)

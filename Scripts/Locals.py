@@ -39,6 +39,7 @@ class InputEvent(Enum):
     move_right = 3
     jump = 4
     fire = 5
+    dash=9
     change_collision_type = 8
 
 
@@ -46,10 +47,13 @@ class Tag(Enum):
     default = auto()
     player = auto()
     enemy = auto()
+
+
 class PlayMode(Enum):
-    once=0
-    loop=1
-    pingpong=2
+    once = 0
+    loop = 1
+    pingpong = 2
+
 
 class Layer(Enum):
     '''
@@ -61,7 +65,7 @@ class Layer(Enum):
     environment = auto()
     sprite = auto()
     UI = auto()
-    gizmo=auto
+    gizmo = auto
 
 
 class ButtonEvent(Enum):
@@ -90,3 +94,6 @@ class Face(Flag):
     back = 0b000001
     around = right | left | front | back
     rightleft = right | left
+    updown = up | down
+    frontback = front | back
+    all = right | left | front | back | up | down

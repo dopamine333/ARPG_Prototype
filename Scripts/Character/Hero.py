@@ -22,6 +22,7 @@ class Hero(Character):
         sword_flash_source = load(
             r"Arts\Character\sword_flash.png").convert_alpha()
         self.jump_force = 2500
+        self.dash_force = 1000
         self.move_speed = 1728
         self.max_hp = 1000
 
