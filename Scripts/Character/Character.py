@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Character.CharacterBrain.CharacterBrain import CharacterBrain
+from Scripts.Tools.Buffer import Buffer
 from Scripts.Physics.Collision import Collision
 from Scripts.Locals import Face, ForceMode
 from Scripts.Attack.AttackParam import AttackParam
@@ -9,8 +10,6 @@ from Scripts.Physics.RigidBody import RigidBody
 from pygame import Vector2, Vector3
 from Scripts.GameObject.Component import Component
 
-# TODO 無敵時間
-# TODO 跳躍冷卻
 # TODO 衝刺
 
 
@@ -39,14 +38,11 @@ class Character(Component):
 
         self.rigidbody: RigidBody = None
         self.brain: CharacterBrain = None
-
-        self.jump_force = 10
-        self.dash_force=10
-        self.move_speed = 1
-        self.face = Face.right
-        self.max_hp = 10
-
-        self.on_ground = False
+        self.buffer=Buffer()
+        self.invincible_time=0.5
+        self.max_hp=10
+        self.hp=self.max_hp
+        self.is_dead=False
 
     def set_brain(self, brain: CharacterBrain):
         self.brain = brain
@@ -58,28 +54,22 @@ class Character(Component):
         self.hp = self.max_hp
         self.brain.start()
 
-    def move(self, direction: Vector2):
-        direction.scale_to_length(self.move_speed)
-        self.rigidbody.add_force(
-            Vector3(direction.x, 0, direction.y), ForceMode.force)
+    def update(self):
+        if self.is_dead:
+            return
+        self.brain.update()
+        self.buffer.update()
 
-    def jump(self):
-        if self.on_ground:
-            self.rigidbody.add_force(
-                Vector3(0, self.jump_force, 0), ForceMode.impulse)
-            self.on_ground = False
+    def end(self):
+        self.brain.end()
 
-    def attack(self):
+    def on_collide(self, collision: Collision):
         pass
 
-    def dash(self):
-        direction=self.rigidbody.velocity
-        if direction.length_squared()<1:
-            return
-        direction.scale_to_length(self.dash_force)
-        self.rigidbody.add_force(direction, ForceMode.impulse)
-
     def under_attack(self, attack_param: AttackParam):
+        if self.buffer.get("invincible"):
+            return
+        self.buffer.set("invincible",self.invincible_time)
         self.rigidbody.add_force(attack_param.force, ForceMode.impulse)
         attack_param.set_defender(self)
         attack_param.show()
@@ -87,21 +77,6 @@ class Character(Component):
         if self.hp <= 0:
             self.dead()
 
-    def update(self):
-        self.brain.update()
-        # 更新面向face
-        acceleration = self.rigidbody.acceleration
-        if acceleration.x > 0:
-            self.face = Face.right
-        elif acceleration.x < 0:
-            self.face = Face.left
-
     def dead(self):
+        self.is_dead=True
         self.destroy()
-
-    def end(self):
-        self.brain.end()
-
-    def on_collide(self, collision: Collision):
-        if collision.face == Face.down:
-            self.on_ground = True

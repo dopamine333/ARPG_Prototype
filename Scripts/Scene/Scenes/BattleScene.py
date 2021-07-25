@@ -44,6 +44,7 @@ class BattleScene(Scene):
             a.set_clip(clip)
             a.set_speed(0.5)
             hero_animations[act]=a
+        hero_animations["Dead"].set_speed(0.1)
         hero = GameObject()
         hero_hero = hero.add_component(Hero)
         hero_rigidbody = hero.add_component(RigidBody)
@@ -102,7 +103,7 @@ class BattleScene(Scene):
             slime_rigidbody.set_collider(Collider((40, 30, 40), (30, 0, 30)))
             slime.set_position((random()*1280, random()*400, random()*1280))
             slime_brain = SlimeBrain()
-            slime_brain.set_target(hero)
+            slime_brain.set_target(hero_hero)
             slime_slime.set_brain(slime_brain)
             slime.set_tag(Tag.enemy)
 

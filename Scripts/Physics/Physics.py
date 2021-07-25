@@ -99,18 +99,23 @@ class Physics:
         if rigidbody.get_surface(Face.right) > (activity_box_surface := Physics.activity_box.get_surface(Face.right)):
             rigidbody.set_surface(Face.right, activity_box_surface)
             rigidbody.velocity.x = 0
+            rigidbody.on_collide(Collision(None, Face.right))
         elif rigidbody.get_surface(Face.left) < (activity_box_surface := Physics.activity_box.get_surface(Face.left)):
             rigidbody.set_surface(Face.left, activity_box_surface)
             rigidbody.velocity.x = 0
+            rigidbody.on_collide(Collision(None, Face.left))
         if rigidbody.get_surface(Face.front) > (activity_box_surface := Physics.activity_box.get_surface(Face.front)):
             rigidbody.set_surface(Face.front, activity_box_surface)
             rigidbody.velocity.z = 0
+            rigidbody.on_collide(Collision(None, Face.front))
         elif rigidbody.get_surface(Face.back) < (activity_box_surface := Physics.activity_box.get_surface(Face.back)):
             rigidbody.set_surface(Face.back, activity_box_surface)
             rigidbody.velocity.z = 0
+            rigidbody.on_collide(Collision(None, Face.back))
         if rigidbody.get_surface(Face.up) > (activity_box_surface := Physics.activity_box.get_surface(Face.up)):
             rigidbody.set_surface(Face.up, activity_box_surface)
             rigidbody.velocity.y = 0
+            rigidbody.on_collide(Collision(None, Face.up))
         elif rigidbody.get_surface(Face.down) < (activity_box_surface := Physics.activity_box.get_surface(Face.down)):
             rigidbody.set_surface(Face.down, activity_box_surface)
             rigidbody.velocity.y = 0

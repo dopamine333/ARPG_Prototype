@@ -87,9 +87,9 @@ class RigidBody(Component):
         ForceMode.impulse ->  施加一個瞬間的力時選擇
         '''
         if force_mode == ForceMode.force:
-            self.acceleration += force*Physics.get_deltatime()  # 時間校正
+            self.acceleration += Vector3(force)*Physics.get_deltatime()  # 時間校正
         if force_mode == ForceMode.impulse:
-            self.acceleration += force
+            self.acceleration += Vector3(force)
 
     def update_surface(self, face: Face):
         if face==Face.all:

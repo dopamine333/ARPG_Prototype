@@ -1,8 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypeVar
-if TYPE_CHECKING:
-    from Scripts.GameObject.Component import Component
+from typing import TypeVar
 
+from Scripts.GameObject.Component import Component
 from typing import Type
 from Scripts.Locals import Tag
 from pygame import Vector3
@@ -49,7 +48,7 @@ class GameObject:
         for component in self.components:
             component.update()
 
-    def add_component(self, component_type:ComponentType)->ComponentType:
+    def add_component(self, component_type:Type[ComponentType])-> ComponentType:
         '''新增並回傳一個組件(Component)，並與此遊戲物件綁定'''
         component = component_type()
         component.gameobject = self
@@ -57,7 +56,7 @@ class GameObject:
         self.components.append(component)
         return component
 
-    def get_component(self, component_type:ComponentType)->ComponentType:
+    def get_component(self, component_type:Type[ComponentType])->ComponentType:
         '''回傳一個組件(Component)，如果該組件的類別為輸入類別或輸入的子類'''
         for component in self.components:
             if isinstance(component, component_type):

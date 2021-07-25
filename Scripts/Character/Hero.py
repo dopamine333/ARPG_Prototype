@@ -1,3 +1,4 @@
+from Scripts.Tools.Buffer import Buffer
 from Scripts.Graphic.Render.SpriteRender import SpriteRender
 from Scripts.Physics.Collision import Collision
 from Scripts.Animation.Animator import Animator
@@ -8,7 +9,7 @@ from Scripts.Character.Character import Character
 from random import random
 import pygame
 from Scripts.Attack.AttackParam import AttackParam
-from Scripts.Locals import Face, Layer, Tag
+from Scripts.Locals import Face, ForceMode, Layer, Tag
 from Scripts.Physics.Box import Box
 from pygame.image import load
 from Scripts.Physics.RigidBody import RigidBody
@@ -19,15 +20,20 @@ import pygame.transform
 
 class Hero(Character):
     def start(self):
+        self.max_hp = 10
+        super().start()
+
         sword_flash_source = load(
             r"Arts\Character\sword_flash.png").convert_alpha()
         self.jump_force = 2500
         self.dash_force = 1000
         self.move_speed = 1728
-        self.max_hp = 1000
-
-        super().start()
         self.rigidbody.damp = 0.92
+
+        self.face=Face.right
+        self.jumpbuffer=Buffer()
+        self.can_jump_since_exit_ground_time=0.5
+        self.can_jump_before_enter_ground_time=0.05
 
         self.sword_damage = 3
         self.sword_force = Vector3(1000, 1200, 0)
@@ -38,20 +44,31 @@ class Hero(Character):
         self.animator = self.get_component(Animator)
         self.render= self.get_component(SpriteRender)
 
-    def jump(self):
-        super().jump()
+    def on_collide(self, collision: Collision):
+        if collision.face is Face.down:
+            self.jumpbuffer.set("on_ground",self.can_jump_since_exit_ground_time)
 
-    def update(self):
-        super().update()
-        self.animator.set_bool("on_ground", self.on_ground)
-        if self.rigidbody.acceleration.length_squared()<1:
-            self.animator.set_bool("running", False)
-        else:
-            self.animator.set_bool("running", True)
-        self.render.set_face(self.face)
-        #print(self.animator.current_animation.frame)
-    
+    def jump(self):
+        self.jumpbuffer.set("jump",self.can_jump_before_enter_ground_time)
+
+    def do_jump(self):
+        self.rigidbody.add_force((0,self.jump_force,0),ForceMode.impulse)
+        self.animator.set_trigger("jump")
+
+    def move(self,direction:Vector2):
+        if self.is_dead:
+            return
+
+        if direction.x > 0:
+            self.face = Face.right
+        elif direction.x < 0:
+            self.face = Face.left
+        direction.scale_to_length(self.move_speed)
+        self.rigidbody.add_force((direction.x,0,direction.y),ForceMode.force)
+        
+
     def dead(self):
+        self.is_dead=True
         self.animator.set_bool("dead",True)
 
     def attack(self):
@@ -73,3 +90,21 @@ class Hero(Character):
                     round(self.sword_damage*random()+self.sword_damage/2), force)
                 attack_param.set_attacker(self)
                 target.under_attack(attack_param)
+
+    def update(self):
+        if self.is_dead:
+            return
+        super().update()
+
+        self.animator.set_bool("on_ground", self.jumpbuffer.get("on_ground"))
+        self.animator.set_bool("running", self.rigidbody.acceleration.length_squared()>1)
+
+        if self.jumpbuffer.get("jump") and self.jumpbuffer.get("on_ground"):
+            self.do_jump()
+            self.jumpbuffer.pop("jump")
+            self.jumpbuffer.pop("on_ground")
+
+        self.jumpbuffer.update()
+
+        self.render.set_face(self.face)
+        #print(self.animator.current_animation.frame)
