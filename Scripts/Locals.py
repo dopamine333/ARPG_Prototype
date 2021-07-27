@@ -47,7 +47,12 @@ class Tag(Enum):
     default = auto()
     player = auto()
     enemy = auto()
-
+class CharacterID(Enum):
+    Hero=0
+    Slime=1
+    GoblinFighter=2
+    GoblinShooter=3
+    GoblinKing=4
 
 class PlayMode(Enum):
     once = 0
