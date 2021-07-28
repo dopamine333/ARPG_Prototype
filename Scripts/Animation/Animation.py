@@ -92,15 +92,20 @@ class Animation:
 
     def use_sprite_sheet(self, sprite_sheet: Surface, start_left_top: Vector2, size: Vector2, center: Vector2, lenght: int):
         '''使用精靈圖表(sprite_sheet)設定動畫片段'''
-        self.length = lenght
+        self.set_clip(self.generate_clip_use_sprite_sheet(sprite_sheet,start_left_top,size,center,lenght))
+    @staticmethod
+    def generate_clip_use_sprite_sheet(sprite_sheet: Surface, start_left_top: Vector2, size: Vector2, center: Vector2, lenght: int):
+        '''使用精靈圖表(sprite_sheet)生成動畫片段'''
+        clip: list[Image]=[]
         size=Vector2(size)
         source_rect = Rect(start_left_top, size)
         for _ in range(lenght):
             source = Surface(size,pygame.SRCALPHA)
             source.blit(sprite_sheet, (0, 0), source_rect)
-            self.clip.append(Image(source, center))
+            clip.append(Image(source, center))
 
             source_rect.x += size.x
+        return clip
 
     def set_clip(self, clip: list[Image]):
         '''設定動畫片段'''

@@ -17,12 +17,14 @@ class LevelSystem(GameSystem):
     def start(self):
         if self.current_level_number > len(self.levels):
             raise Exception("unknow level!!")
-        self.current_level = self.levels[self.current_level-1]
+        self.current_level = self.levels[self.current_level_number-1]
         self.current_level.start()
 
     def update(self):
         self.current_level.update()
-
+        
+    def get_spawnpoint(self):
+        return self.current_level.current_savepoint.spawnpoint
     # region add levels
 
     def add_levels(self, *levels: Level):

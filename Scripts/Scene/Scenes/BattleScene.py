@@ -1,3 +1,4 @@
+from Scripts.GameSystem.GameManager import GameManager
 from Scripts.Animation.Transition import Transition
 from Scripts.Animation.Animation import Animation
 from pygame.transform import scale
@@ -30,6 +31,9 @@ from Scripts.Animation.Animator import Animator
 from os.path import join
 class BattleScene(Scene):
     def scene_start(self):
+        '''
+        # region text gamemanager
+        
         # region hero
         hero_image = Image(
             load( r"Arts\Character\hero.png").convert_alpha(), (25, 123))
@@ -109,7 +113,8 @@ class BattleScene(Scene):
 
             self.add_gameobject(slime)
         # endregion
-
+        # endregion
+        '''
         # region obstacle
         for _ in range(8):
             size = random()*150+50
@@ -145,12 +150,12 @@ class BattleScene(Scene):
         to_mainmenu_button_button.attach(ButtonEvent.up, self.to_mainmenu)
         self.add_gameobject(to_mainmenu_button)
         # endregion
-
+        
         #region camera
         camera=GameObject()
         camera_camera=camera.add_component(Camera)
         camera_controller=camera.add_component(CameraController)
-        camera_controller.set_target(hero)
+        #camera_controller.set_target(hero)
         camera_controller.set_follow_axis(y=False)
         camera_controller.set_offset((0,100,-100))
         camera_camera.set_activity_rect(Rect(-500,-500,2000,2000))
@@ -162,6 +167,11 @@ class BattleScene(Scene):
 
         RenderManager.set_camera(camera_camera)
         Physics.set_activity_box(Box((1280, 720, 1280), (640, 360, 640)))
+
+        gamemanager=GameObject()
+        from Data.LevelData import LevelData1
+        gamemanager.add_component(GameManager).levelsystem.add_level(LevelData1.read())
+        self.add_gameobject(gamemanager)
 
     def scene_update(self):
         MouseManager.update()

@@ -28,10 +28,13 @@ class CameraController(Component):
 
     def start(self):
         self.camera = self.get_component(Camera)
+        if self.target:
+            self.position.xyz = self.target.position+self.offset
     # region setter
 
     def set_target(self, target: GameObject):
         self.target = target
+        self.position.xyz = self.target.position+self.offset
 
     def set_offset(self, offset: Vector3):
         self.offset = Vector3(offset)
@@ -41,10 +44,7 @@ class CameraController(Component):
 
     def set_follow_axis(self, x=True, y=True, z=True):
         self.follow_axis = (x, y, z)
-    # endregion
-
-    def start(self):
-        self.position.xyz = self.target.position+self.offset
+    # endregion        
 
     def update(self):
         if self.target:

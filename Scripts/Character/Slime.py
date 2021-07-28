@@ -1,8 +1,9 @@
 
+from Scripts.VisualEffectManager.VisualEffectManager import VisualEffectManager
 from Scripts.Tools.Buffer import Buffer
 from Scripts.Animation.Animator import Animator
 from enum import Flag
-from Scripts.Locals import Face, ForceMode, Tag
+from Scripts.Locals import Face, ForceMode, Tag, VisualEffectID
 from Scripts.Character.Character import Character
 from Scripts.Physics.Collision import Collision
 from Scripts.Attack.AttackParam import AttackParam
@@ -13,9 +14,17 @@ from pygame import Vector2, Vector3
 
 
 class Slime(Character):
+    def __init__(self) -> None:
+        super().__init__()
+        self.jump_visualeffectID: VisualEffectID = None
+        self.move_visualeffectID: VisualEffectID = None
+        self.landing_visualeffectID: VisualEffectID = None
+        self.attack_visualeffectID: VisualEffectID = None
+        self.underattack_visualeffectID: VisualEffectID = None
+        self.dead_visualeffectID: VisualEffectID = None
     def start(self):
         self.max_hp = 20
-        self.invincible_time=0
+        self.invincible_time = 0
         super().start()
 
         self.jump_force = 2800
@@ -43,6 +52,13 @@ class Slime(Character):
         self.jumpbuffer.pop("jump")
         self.jumpbuffer.pop("on_ground")
 
+        self.play_visualeffect(self.jump_visualeffectID, self.get_bottom())
+
+    def get_bottom(self):
+        bottom = self.position.xyz
+        bottom.y = self.rigidbody.get_surface(Face.down)
+        return bottom
+
     def update(self):
         super().update()
 
@@ -63,19 +79,47 @@ class Slime(Character):
             self.rigidbody.add_force(
                 (direction.x, 0, direction.y), ForceMode.impulse)
             self.do_jump()
+        self.play_visualeffect(self.move_visualeffectID, self.get_bottom())
 
+        
+
+    def under_attack(self, attack_param: AttackParam):
+        #FIXME 降under_attack街口、實際受傷、播放動畫分開
+        if self.buffer.get("invincible"):
+            return
+        position = self.position+Vector3((random()-0.5)*self.rigidbody.collider.get_size().x,
+                                         (random()-0.5) *
+                                         self.rigidbody.collider.get_size().y,
+                                         (random()-0.5)*self.rigidbody.collider.get_size().z)
+        self.play_visualeffect(
+            self.underattack_visualeffectID, position)
+        super().under_attack(attack_param)
+    def dead(self):
+        self.is_dead=True
     def on_collide(self, collision: Collision):
         if collision.face is Face.down:
+            if not self.jumpbuffer.get("on_ground"):
+                self.play_visualeffect(self.landing_visualeffectID, self.get_bottom())  
             self.jumpbuffer.set(
-                "on_ground", self.can_jump_since_exit_ground_time)
+            "on_ground", self.can_jump_since_exit_ground_time)
+
         if not collision.gameobject:
             return
         if collision.gameobject.compare_tag(Tag.player):
             if collision.face in Face.around:
-                target = collision.gameobject.get_component(
-                    Character)
-                
-                attack_param = AttackParam(
-                    self.collide_damage)
-                attack_param.set_attacker(self)
-                target.under_attack(attack_param)
+                self.attack(collision.gameobject.get_component(Character))
+
+    def attack(self, target: Character):
+        attack_param = AttackParam(self.collide_damage)
+        attack_param.set_attacker(self)
+        target.under_attack(attack_param)
+
+        position = (target.position+self.position)*0.5
+        self.play_visualeffect(self.attack_visualeffectID, position)
+
+    def end(self):
+        super().end()
+        self.play_visualeffect(self.dead_visualeffectID, self.position)
+
+    def play_visualeffect(self, visualeffectID: VisualEffectID, position: Vector3):
+        VisualEffectManager.Instance().play(visualeffectID, position)

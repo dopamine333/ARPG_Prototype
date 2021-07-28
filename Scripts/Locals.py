@@ -54,6 +54,29 @@ class CharacterID(Enum):
     GoblinShooter=3
     GoblinKing=4
 
+class VisualEffectID(Enum):
+    hero_move=auto()
+    hero_jump=auto()
+    hero_landing=auto()
+    hero_attack=auto()
+    hero_underattack=auto()
+    hero_dead=auto()
+    slime_move=auto()
+    slime_jump=auto()
+    slime_landing=auto()
+    slime_attack=auto()
+    slime_underattack=auto()
+    slime_dead=auto()
+    '''
+    move=auto()
+    jump=auto()
+    landing=auto()
+    attack=auto()
+    underattack=auto()
+    dead=auto()
+    '''
+    
+
 class PlayMode(Enum):
     once = 0
     loop = 1
