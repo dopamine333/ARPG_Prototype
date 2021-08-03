@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Character.Character import Character
-from Scripts.VisualEffectManager.VisualEffectManager import VisualEffectManager
+from Scripts.VFXManager.VFXManager import VFXManager
 from Scripts.Animation.Animation import Animation
 from Scripts.Animation.Animator import Animator
 from random import random
@@ -45,5 +45,5 @@ class AttackParam:
     def show(self):
         position = (self.attacker.position+self.defender.position)/2 \
             + Vector3(-25+random()*50, 90+random()*50, -25+random()*50)
-        VisualEffectManager.Instance().play_damagetext(
+        VFXManager.Instance().play_damagetext(
             self.damage, self.defender.gameobject.tag, position)

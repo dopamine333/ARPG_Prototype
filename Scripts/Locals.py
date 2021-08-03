@@ -53,15 +53,31 @@ class CharacterID(Enum):
     GoblinFighter=2
     GoblinShooter=3
     GoblinKing=4
-
-class VisualEffectID(Enum):
+class MusicID(Enum):
+    pass
+class SFXID(Enum):
     hero_move=auto()
     hero_jump=auto()
     hero_landing=auto()
     hero_attack=auto()
     hero_underattack=auto()
     hero_dead=auto()
-    slime_move=auto()
+
+    #slime_move=auto()
+    slime_jump=auto()
+    slime_landing=auto()
+    #slime_attack=auto()
+    slime_underattack=auto()
+    slime_dead=auto()
+
+class VFXID(Enum):
+    hero_move=auto()
+    hero_jump=auto()
+    hero_landing=auto()
+    hero_attack=auto()
+    hero_underattack=auto()
+    hero_dead=auto()
+
     slime_jump=auto()
     slime_landing=auto()
     slime_attack=auto()

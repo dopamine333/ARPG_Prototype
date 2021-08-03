@@ -86,8 +86,7 @@ class Level:
             
             RenderManager.camera.draw(Image(self.checkpoint_range_sketch,(0,0)),Vector3(700,0,400))
         #FIXME 測試用畫背景
-        x,y=mouse.get_pos()
-        RenderManager.camera.draw(Image(self.bg_sketch,(0,0)),Vector3(0,0,400))
+        RenderManager.camera.draw_background(Image(self.bg_sketch,(0,0)),Vector3(0,0,400))
     
     def finish_level(self):
         #TODO 結束關卡通知

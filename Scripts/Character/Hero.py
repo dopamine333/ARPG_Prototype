@@ -1,4 +1,5 @@
-from Scripts.VisualEffectManager.VisualEffectManager import VisualEffectManager
+from Scripts.AudioManager.AudioManager import AudioManger
+from Scripts.VFXManager.VFXManager import VFXManager
 from Scripts.Tools.Buffer import Buffer
 from Scripts.Graphic.Render.SpriteRender import SpriteRender
 from Scripts.Physics.Collision import Collision
@@ -10,7 +11,7 @@ from Scripts.Character.Character import Character
 from random import random
 import pygame
 from Scripts.Attack.AttackParam import AttackParam
-from Scripts.Locals import Face, ForceMode, Layer, Tag, VisualEffectID
+from Scripts.Locals import Face, ForceMode, Layer, SFXID, Tag, VFXID
 from Scripts.Physics.Box import Box
 from pygame.image import load
 from Scripts.Physics.RigidBody import RigidBody
@@ -19,14 +20,6 @@ import pygame.transform
 
 
 class Hero(Character):
-    def __init__(self) -> None:
-        super().__init__()
-        self.jump_visualeffectID: VisualEffectID = None
-        self.move_visualeffectID: VisualEffectID = None
-        self.landing_visualeffectID: VisualEffectID = None
-        self.attack_visualeffectID: VisualEffectID = None
-        self.underattack_visualeffectID: VisualEffectID = None
-        self.dead_visualeffectID: VisualEffectID = None
 
     def start(self):
         self.max_hp = 10
@@ -51,7 +44,19 @@ class Hero(Character):
         self.sword_flash_box_size = Vector3(100, 60, 100)
         self.sword_flash_offset = Vector3(100, 60, 0)
 
-        
+        self.jump_VFXID = VFXID.hero_jump
+        self.move_VFXID = VFXID.hero_move
+        self.landing_VFXID = VFXID.hero_landing
+        self.attack_VFXID = VFXID.hero_attack
+        self.underattack_VFXID = VFXID.hero_underattack
+        self.dead_VFXID = VFXID.hero_dead
+
+        self.jump_SFXID = SFXID.hero_jump
+        self.move_SFXID = SFXID.hero_move
+        self.landing_SFXID = SFXID.hero_landing
+        self.attack_SFXID = SFXID.hero_attack
+        self.underattack_SFXID = SFXID.hero_underattack
+        self.dead_SFXID = SFXID.hero_dead
 
         self.animator = self.get_component(Animator)
         self.render = self.get_component(SpriteRender)
@@ -59,17 +64,24 @@ class Hero(Character):
     def on_collide(self, collision: Collision):
         if collision.face is Face.down:
             if not self.jumpbuffer.get("on_ground"):
-                self.play_visualeffect(self.landing_visualeffectID, self.get_bottom())
+                self.on_landing()
             self.jumpbuffer.set(
-                "on_ground", self.can_jump_since_exit_ground_time)
+            "on_ground", self.can_jump_since_exit_ground_time)
+    def on_landing(self):
+        self.play_VFX(self.landing_VFXID, self.get_bottom())
+        self.play_SFX(self.landing_SFXID)
+        
 
-
+    def play_move_VFX_and_SFX(self):
+        self.play_SFX(self.move_SFXID)
+        self.play_VFX(self.move_VFXID, self.get_bottom())
 
     def jump(self):
         self.jumpbuffer.set("jump", self.can_jump_before_enter_ground_time)
 
     def do_jump(self):
-        self.play_visualeffect(self.jump_visualeffectID,  self.get_bottom())
+        self.play_VFX(self.jump_VFXID,  self.get_bottom())
+        self.play_SFX(self.jump_SFXID)
 
         self.rigidbody.add_force((0, self.jump_force, 0), ForceMode.impulse)
         self.animator.set_trigger("jump")
@@ -88,12 +100,11 @@ class Hero(Character):
         self.rigidbody.add_force(
             (direction.x, 0, direction.y), ForceMode.force)
 
-        self.play_visualeffect(self.move_visualeffectID, self.get_bottom())
-
     def dead(self):
         self.is_dead = True
         self.animator.set_bool("dead", True)
-        self.play_visualeffect(self.dead_visualeffectID, self.position)
+        self.play_VFX(self.dead_VFXID, self.position)
+        self.play_SFX(self.dead_SFXID)
 
     def attack(self):
         force = self.sword_force.xyz
@@ -115,8 +126,9 @@ class Hero(Character):
                 attack_param.set_attacker(self)
                 target.under_attack(attack_param)
 
-        self.play_visualeffect(
-            self.attack_visualeffectID, self.position+offset)
+        self.play_VFX(
+            self.attack_VFXID, self.position+offset)
+        self.play_SFX(self.attack_SFXID)
 
     # TODO 使用樣板模式撥放動畫
     def under_attack(self, attack_param: AttackParam):
@@ -127,7 +139,8 @@ class Hero(Character):
                                          (random()-0.5) *
                                          self.rigidbody.collider.get_size().y,
                                          (random()-0.5)*self.rigidbody.collider.get_size().z)
-        self.play_visualeffect(self.underattack_visualeffectID, position)
+        self.play_VFX(self.underattack_VFXID, position)
+        self.play_SFX(self.underattack_SFXID)
 
     def update(self):
         if self.is_dead:
@@ -148,5 +161,8 @@ class Hero(Character):
         self.render.set_face(self.face)
         # print(self.animator.current_animation.frame)
 
-    def play_visualeffect(self, visualeffectID: VisualEffectID, position: Vector3):
-        VisualEffectManager.Instance().play(visualeffectID, position)
+    def play_VFX(self, vfxID: VFXID, position: Vector3):
+        VFXManager.Instance().play(vfxID, position)
+
+    def play_SFX(self, sfxID: SFXID):
+        AudioManger.Instance().play_SFX(sfxID)
