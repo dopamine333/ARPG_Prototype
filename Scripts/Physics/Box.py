@@ -29,20 +29,31 @@ class Box:
     def get_surface(self, face: Face):
         '''回傳碰撞箱(Collider)不同面的座標'''
         return self.surfaces[face]
+    def __repr__(self) -> str:
+        return f"""
+        right\t{self.get_surface(Face.right)}
+        left\t{self.get_surface(Face.left)}
+        up\t{self.get_surface(Face.up)}
+        down\t{self.get_surface(Face.down)}
+        front\t{self.get_surface(Face.front)}
+        back\t{self.get_surface(Face.back)}
+        center\t{self.center}
+        size\t{self.size}
+        """
 
     def union(self, other_box: Box):
         size = (max(self.get_surface(Face.right)-other_box.get_surface(Face.left),
-                    other_box.get_surface(Face.right)-other_box.get_surface(Face.left)),
+                    other_box.get_surface(Face.right)-self.get_surface(Face.left)),
                 max(self.get_surface(Face.up)-other_box.get_surface(Face.down),
-                    other_box.get_surface(Face.up)-other_box.get_surface(Face.down)),
+                    other_box.get_surface(Face.up)-self.get_surface(Face.down)),
                 max(self.get_surface(Face.front)-other_box.get_surface(Face.back),
-                    other_box.get_surface(Face.front)-other_box.get_surface(Face.back)),)
+                    other_box.get_surface(Face.front)-self.get_surface(Face.back)),)
         center=(0.5*(max(self.get_surface(Face.right),other_box.get_surface(Face.right))+\
-                min(other_box.get_surface(Face.left),other_box.get_surface(Face.left))),
+                min(other_box.get_surface(Face.left),self.get_surface(Face.left))),
                 0.5*(max(self.get_surface(Face.up),other_box.get_surface(Face.up))+\
-                 min(other_box.get_surface(Face.down),other_box.get_surface(Face.down))),
+                 min(other_box.get_surface(Face.down),self.get_surface(Face.down))),
                 0.5*(max(self.get_surface(Face.front),other_box.get_surface(Face.front))+\
-                min(other_box.get_surface(Face.back),other_box.get_surface(Face.back))))
+                min(other_box.get_surface(Face.back),self.get_surface(Face.back))))
 
         return Box(size,center)
      

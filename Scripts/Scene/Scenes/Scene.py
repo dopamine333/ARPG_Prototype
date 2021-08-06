@@ -15,6 +15,7 @@ class Scene:
     def __init__(self) -> None:
         self.gameobjects: list[GameObject] = []
         self.to_del_gameobjects: list[GameObject] = []
+        self.to_add_gameobjects: list[GameObject] = []
 
     def add_gameobject(self, gameobject: GameObject):
         self.gameobjects.append(gameobject)
@@ -22,7 +23,12 @@ class Scene:
     def add_gameobjects(self, *gameobjects: list[GameObject]):
         self.gameobjects.extend(gameobjects)
 
-    def remove_gameobject(self, gameobject: GameObject):
+    def instantiate_gameobject(self, gameobject: GameObject):
+        self.to_add_gameobjects.append(gameobject)
+        gameobject.start()
+
+    def destroy_gameobject(self, gameobject: GameObject):
+        gameobject.end()
         self.to_del_gameobjects.append(gameobject)
 
     def scene_start(self):
@@ -46,6 +52,10 @@ class Scene:
             gameobject.end()
 
     def update(self):
+        if len(self.to_add_gameobjects)>0:
+            self.gameobjects.extend(self.to_add_gameobjects)
+            self.to_add_gameobjects.clear()
+
         for gameobject in self.gameobjects:
             gameobject.update()
         for del_gameobject in self.to_del_gameobjects:

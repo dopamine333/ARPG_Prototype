@@ -3,10 +3,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.GameSystem.GameManager import GameManager
     from Scripts.Character.CharacterBrain.EnemyBrain import EnemyBrain
+from Scripts.EventManager.EventManager import EventManager
 from Scripts.Character.Character import Character
 from Scripts.Factory.FactoryManager import FactoryManager
 from pygame import Vector3
-from Scripts.Locals import CharacterID, Tag
+from Scripts.Locals import CharacterID, GameEvent, Tag
 from Scripts.GameSystem.GameSystem import GameSystem
 
 
@@ -15,6 +16,8 @@ class EnemySystem(GameSystem):
         super().__init__(gamemanager)
         self.alive_enemies: list[Character] = []
         self.counting_death = False
+
+        EventManager.attach(GameEvent.player_spawn,self.reset_target)
 
     def generate_enemy(self, enemies: list[tuple[CharacterID, Vector3]]):
         characterfactory = FactoryManager.Instance().get_characterfactory()
@@ -39,8 +42,12 @@ class EnemySystem(GameSystem):
             for del_enemy in to_del:
                 self.alive_enemies.remove(del_enemy)
             if len(self.alive_enemies) == 0:
+                EventManager.notify(GameEvent.enemy_clear)
                 self.counting_death = False
-
+    def reset_target(self):
+        for enemy in self.alive_enemies:
+            brain:EnemyBrain=enemy.brain
+            brain.set_target(self.gamemanager.get_player())
     def enemy_dead(self, enemy: Character):
         # TODO 敵人死亡特效
         print("enemysystem:enemy dead!")

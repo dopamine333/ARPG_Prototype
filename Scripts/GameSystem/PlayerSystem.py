@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.GameSystem.GameManager import GameManager
 
+from Scripts.EventManager.EventManager import EventManager
 from Scripts.Graphic.RenderManager import RenderManager
-from Scripts.Locals import CharacterID, Tag
+from Scripts.Locals import CharacterID, GameEvent, Tag
 from Scripts.Factory.FactoryManager import FactoryManager
 from Scripts.Character.Character import Character
 from Scripts.GameSystem.GameSystem import GameSystem
@@ -18,6 +19,7 @@ class PlayerSystem(GameSystem):
         self.player_characterID = CharacterID.Hero
         self.alive_player: Character = None
 
+    
     def start(self):
         self.spawn_player()
 
@@ -30,12 +32,11 @@ class PlayerSystem(GameSystem):
         player.gameobject.instantiate()
         self.alive_player = player
 
-        RenderManager.camera.get_component(CameraController).set_target(player)
+        RenderManager.camera.get_component(CameraController).set_target(player.position)
+        EventManager.notify(GameEvent.player_spawn)
     def update(self):
         if self.alive_player.is_dead:
             self.spawn_player()
-            #FIXME 用觀察者模式讓角色復活時 敵人重新鎖定玩家
-            for enemy in self.gamemanager.enemysystem.alive_enemies:
-                enemy.brain.set_target(self.alive_player)
+            
     def get_player(self) -> Character:
         return self.alive_player

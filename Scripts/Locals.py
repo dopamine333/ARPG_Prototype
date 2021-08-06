@@ -26,8 +26,8 @@ class ForceMode(Enum):
 
 
 class GameEvent(Enum):
-    add_gameobject = 0
-    remove_gameobject = 1
+    enemy_clear=0
+    player_spawn=1
 
 
 class InputEvent(Enum):

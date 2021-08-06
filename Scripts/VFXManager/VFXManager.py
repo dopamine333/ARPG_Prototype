@@ -51,11 +51,11 @@ class VFXManager(Singleton):
                 "Segoe Script", int(size*(damage*0.1+1)), True)
             text = font.render(str(damage), True, color)
             clip.append(Image(text))
+        print(f"new damagetext {damage=} {defender_tag.name=}")
         return clip
         if not damage in self.damagetext_dict:
             self.damagetext_dict[damage] = {}
         self.damagetext_dict[damage][defender_tag] = clip
-        print("new text", damage, defender_tag)
         return self.damagetext_dict[damage][defender_tag]
 
     def play_damagetext(self, damage: int, defender_tag: Tag, position: Vector3):

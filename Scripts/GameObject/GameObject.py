@@ -69,10 +69,8 @@ class GameObject:
 
     def destroy(self):
         '''銷毀此遊戲物件並從場景(Scene)上移除'''
-        self.end()
-        SceneManager.current_scene.remove_gameobject(self)
+        SceneManager.current_scene.destroy_gameobject(self)
 
     def instantiate(self):
         '''新增此遊戲物件到場景(Scene)上'''
-        SceneManager.current_scene.add_gameobject(self)
-        self.start()
+        SceneManager.current_scene.instantiate_gameobject(self)

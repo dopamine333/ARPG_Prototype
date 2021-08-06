@@ -21,6 +21,7 @@ import pygame.transform
 
 class Hero(Character):
 
+
     def start(self):
         self.max_hp = 10
         super().start()
@@ -61,7 +62,9 @@ class Hero(Character):
         self.animator = self.get_component(Animator)
         self.render = self.get_component(SpriteRender)
 
+
     def on_collide(self, collision: Collision):
+
         if collision.face is Face.down:
             if not self.jumpbuffer.get("on_ground"):
                 self.on_landing()
@@ -141,7 +144,7 @@ class Hero(Character):
                                          (random()-0.5)*self.rigidbody.collider.get_size().z)
         self.play_VFX(self.underattack_VFXID, position)
         self.play_SFX(self.underattack_SFXID)
-
+    
     def update(self):
         if self.is_dead:
             return
@@ -159,7 +162,6 @@ class Hero(Character):
         self.jumpbuffer.update()
 
         self.render.set_face(self.face)
-        # print(self.animator.current_animation.frame)
 
     def play_VFX(self, vfxID: VFXID, position: Vector3):
         VFXManager.Instance().play(vfxID, position)

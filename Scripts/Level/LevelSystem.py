@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.GameSystem.GameManager import GameManager
 
+from pygame import Vector3
+from Scripts.Locals import CharacterID
 from Scripts.Level.Level import Level
 from Scripts.GameSystem.GameSystem import GameSystem
 
@@ -22,9 +24,12 @@ class LevelSystem(GameSystem):
 
     def update(self):
         self.current_level.update()
-        
+
     def get_spawnpoint(self):
         return self.current_level.current_savepoint.spawnpoint
+        
+    def generate_enemy(self, enemies: list[tuple[CharacterID, Vector3]]):
+        self.gamemanager.generate_enemy(enemies)
     # region add levels
 
     def add_levels(self, *levels: Level):

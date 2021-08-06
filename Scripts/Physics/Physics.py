@@ -47,7 +47,7 @@ class Physics:
     @staticmethod
     def change_collision_type():
         Physics.elastic = not Physics.elastic
-        print(Physics.elastic)
+        print(f"{Physics.elastic=}")
 
     @staticmethod
     def set_activity_box(activity_box: Box):

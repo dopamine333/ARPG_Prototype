@@ -26,21 +26,15 @@ class Camera(Component):
             Vector2(0, -0.5)  # z
         ]
         self.view_rect = Rect(0, 0, 0, 0)
-        self.activity_rect: Rect = None
 
         self.background:tuple[Image,Vector3]=None
     def start(self):
         self.update_view_rect()
 
     def update_view_rect(self):
-        self.view_rect.center = self.world_to_screen(
-            self.position, self.view_rect.height)
-        if self.activity_rect:
-            self.view_rect.clamp_ip(self.activity_rect)
-
-
-    def set_activity_rect(self, activity_rect: Rect):
-        self.activity_rect = activity_rect
+        self.view_rect.center = self.world_to_screen(self.position)
+        
+    
     def set_shadow_color(self, shadow_color: Color):
         self.shadow_color= shadow_color
 
@@ -60,9 +54,6 @@ class Camera(Component):
         sprite_layer = layer.copy()
         shadow_layer = layer.copy()
 
-        #世界座標轉換到畫面座標時y軸的偏移
-        layer_height= layer.get_height()
-
         # 將二元樹sprite_orders根據z軸由遠排到近(大排到小)
         orders: list[DrawSpriteOrder] = self.sprite_orders.get_list()
         self.sprite_orders.clear()
@@ -70,7 +61,7 @@ class Camera(Component):
         for order in orders:
             # 在sprite_layer層上畫出sprite
             source = order.image.source
-            position = self.world_to_screen(order.position, layer_height)
+            position = self.world_to_screen(order.position)
             topleft = order.image.offset(position)-self.view_rect.topleft
             sprite_layer.blit(source, topleft)
 
@@ -88,13 +79,12 @@ class Camera(Component):
                     (0, 0),
                     shadow_size_on_screen
                 )
-                shadow_rect.center = self.world_to_screen(
-                    shadow_position, layer_height)
+                shadow_rect.center = self.world_to_screen(shadow_position)
                 shadow_rect.top -= self.view_rect.top
                 shadow_rect.left -= self.view_rect.left
                 ellipse(shadow_layer, self.shadow_color, shadow_rect)
         if self.background:
-            position = self.world_to_screen(self.background[1], layer_height)
+            position = self.world_to_screen(self.background[1])
             topleft = self.background[0].offset(position)-self.view_rect.topleft
             layer.blit(self.background[0].source,topleft)
             self.background=None
@@ -107,16 +97,15 @@ class Camera(Component):
             DrawSpriteOrder(image, position, shadow_size))
     def draw_background(self,image: Image, position: Vector3):
         self.background=(image,position)
-    def world_to_screen(self, world_position: Vector3, screen_height: float):
+    def world_to_screen(self, world_position: Vector3):
         '''
         將世界座標轉換成螢幕座標
         '''
         # 矩陣乘法再加上平移
-        screen_position = Vector2()
+        screen_position = Vector2(0,self.view_rect.height)
         screen_position += self.world_to_screen_matrix[0]*world_position.x
         screen_position += self.world_to_screen_matrix[1]*world_position.y
         screen_position += self.world_to_screen_matrix[2]*world_position.z
-        screen_position.y += screen_height
         return screen_position
 
 
