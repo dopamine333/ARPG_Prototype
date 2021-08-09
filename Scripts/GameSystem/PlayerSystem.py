@@ -36,7 +36,7 @@ class PlayerSystem(GameSystem):
 
     def update(self):
         if self.alive_player.is_dead:
-            EventManager.notify(GameEvent.player_dead)
+            EventManager.get(GameEvent.player_dead).notify()
             self.spawn_player()
 
     def get_player(self) -> Character:

@@ -1,3 +1,4 @@
+from Scripts.Tools.Action import Action
 from Scripts.Graphic.Image import Image
 from Scripts.Button.MouseManager import MouseManager
 from typing import Callable
@@ -22,7 +23,7 @@ class Button(Component):
         self.button_size: Vector2 = None
         self.button_center: Vector2 = None
 
-        self.button_events: dict[ButtonEvent, list[Callable]] = {}
+        self.button_events: dict[ButtonEvent, Action] = {}
         self.mouse_over = False
         self.mouse_pressed = False
 
@@ -69,25 +70,11 @@ class Button(Component):
         self.mouse_pressed = mouse_pressed
 
         return mouse_over
-
-    def attach(self, button_event: ButtonEvent, func: Callable):
-        '''
-        註冊觸發按鈕事件時想被通知的方法
-        '''
+        
+    def get_button_event(self,button_event: ButtonEvent):
         if not button_event in self.button_events:
-            self.button_events[button_event] = []
-        self.button_events[button_event].append(func)
-
-    def detach(self, button_event: ButtonEvent, func: Callable):
-        '''
-        取消註冊觸發按鈕事件時想被通知的方法
-        '''
-        if not button_event in self.button_events:
-            raise Exception("detach the unkwon event!")
-        if not func in self.button_events[button_event]:
-            raise Exception("detach the unkwon func!")
-
-        self.button_events[button_event].remove(func)
+            self.button_events[button_event] = Action()
+        return self.button_events[button_event]
 
     def notify(self, button_event: ButtonEvent):
         '''
@@ -95,5 +82,4 @@ class Button(Component):
         '''
         if not button_event in self.button_events:
             return
-        for func in self.button_events[button_event]:
-            func()
+        self.button_events[button_event].notify()

@@ -39,12 +39,12 @@ class Checkpoint:
 
         # if self.is_triggered:
 
-        EventManager.detach(self.finish_event, self.finish)
+        EventManager.get(self.finish_event) - self.finish
 
     def finish(self):
         '''完成一個檢查點'''
         # 解除註冊使該檢查點結束的事件
-        EventManager.detach(self.finish_event, self.finish)
+        EventManager.get(self.finish_event) - self.finish
         # 如果是最後檢查點 通知關卡結束
         if self.is_final_checkpoint():
             self.level.finish_level()
@@ -91,7 +91,7 @@ class Checkpoint:
         # 將相機與物理限制在當前檢查點之內
         self.apply_self_activity_range()
         # 註冊使該檢查點結束的事件
-        EventManager.attach(self.finish_event, self.finish)
+        EventManager.get(self.finish_event) + self.finish
 
     def apply_render_activity_rect(self, render_activity_rect: Rect):
         RenderManager.camera.get_component(

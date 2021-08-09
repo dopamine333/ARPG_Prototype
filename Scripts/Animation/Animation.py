@@ -11,6 +11,7 @@ from Scripts.Animation.Transition import Transition
 
 from Scripts.Locals import PlayMode
 
+from Scripts.Tools.Action import Action
 
 class Animation:
     '''
@@ -28,7 +29,7 @@ class Animation:
 
     def __init__(self) -> None:
         self.clip: list[Image] = []
-        self.animation_events: dict[int, list[Callable[[]]]] = {}
+        self.animation_events: dict[int, Action] = {}
         self.length = 1
         self.frame = 0
         self.animator: Animator = None
@@ -75,7 +76,7 @@ class Animation:
             self.animator.set_image(self.clip[int_frame])
         # 通知動畫事件
         if self.frame in self.animation_events:
-            self.notify(int_frame)
+            self.animation_events[self.frame].notify()
         # 檢查是否要切換動畫
         for transition in self.transitions:
             transition.check(int_frame == self.length-1)
@@ -126,26 +127,8 @@ class Animation:
         self.clip = clip
         self.length = len(clip)
 
-    def attach(self, frame: int, func: Callable):
-        '''
-        註冊撥放到該幀時想被通知的方法
-        '''
+    def get_frame_event(self, frame: int):
         if not frame in self.animation_events:
-            self.animation_events[frame] = []
-        self.animation_events[frame].append(func)
+            self.animation_events[frame] = Action()
+        return self.animation_events[frame]
 
-    def detach(self, frame: int, func: Callable):
-        '''
-        取消註冊撥放到該幀時想被通知的方法
-        '''
-        if not frame in self.animation_events:
-            raise Exception("detach the unkwon event!")
-        if not func in self.animation_events[frame]:
-            raise Exception("detach the unkwon func!")
-
-        self.animation_events[frame].remove(func)
-
-    def notify(self, frame: int):
-        '''呼叫所有註冊到這幀的方法'''
-        for event in self.animation_events[frame]:
-            event()

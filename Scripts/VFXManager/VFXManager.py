@@ -137,7 +137,7 @@ class VFXManager(Singleton):
         fading_away_animation = Animation()
         fading_away_animation.set_clip(
             self.get_damagetext_clip(damage, defender_tag))
-        fading_away_animation.attach(59, damagetext.destroy)
+        fading_away_animation.get_frame_event(59) + damagetext.destroy
         animator.set_default_animation(fading_away_animation)
         render.set_shadow_size((40, 40))
         damagetext.set_position(position)

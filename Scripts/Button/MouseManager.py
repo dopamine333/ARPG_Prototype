@@ -41,16 +41,16 @@ class MouseManager:
     def attach(button: Button):
         '''註冊按鈕(Button)'''
         MouseManager.buttons.append(button)
-        button.attach(ButtonEvent.enter, MouseManager.mouse_enter_buttom)
-        button.attach(ButtonEvent.exit, MouseManager.mouse_exit_buttom)
+        button.get_button_event(ButtonEvent.enter) + MouseManager.mouse_enter_buttom
+        button.get_button_event(ButtonEvent.exit) + MouseManager.mouse_exit_buttom
 
     @staticmethod
     def detach(button: Button):
         '''取消註冊按鈕(Button)'''
         if button in MouseManager.buttons:
             MouseManager.buttons.remove(button)
-        button.detach(ButtonEvent.enter, MouseManager.mouse_enter_buttom)
-        button.detach(ButtonEvent.exit, MouseManager.mouse_exit_buttom)
+        button.get_button_event(ButtonEvent.enter) - MouseManager.mouse_enter_buttom
+        button.get_button_event(ButtonEvent.exit) - MouseManager.mouse_exit_buttom
 
     @staticmethod
     def update():

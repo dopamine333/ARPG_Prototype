@@ -9,6 +9,7 @@ from Scripts.GameObject.Component import Component
 from Scripts.Locals import Face, ForceMode, GRAVITY
 from pygame import Vector3
 
+from Scripts.Tools.Action import Action
 
 class RigidBody(Component):
     '''
@@ -33,7 +34,7 @@ class RigidBody(Component):
         self.velocity = Vector3()
         self.acceleration = Vector3()
         self.surfaces: dict[Face, float] = {}
-        self.on_collide_notify: list[Callable] = []
+        self.on_collide_notify=Action()
 
     # region setter
 
@@ -139,25 +140,6 @@ class RigidBody(Component):
         self.update_surface(face)
 
     def on_collide(self, collision: Collision):
-        self.notify(collision)
+        self.on_collide_notify.notify(collision)
 
-    def attach(self, func: Callable):
-        '''
-        註冊碰撞時想被通知的方法
-
-        該方法應有一個碰撞資訊類別(Collision)的參數
-
-        參考: def on_collide(collision: Collision)
-        '''
-        self.on_collide_notify.append(func)
-
-    def detach(self, func: Callable):
-        '''取消註冊碰撞時想被通知的方法'''
-        if not func in self.on_collide_notify:
-            raise Exception("detach the unkwon func!")
-        self.on_collide_notify.remove(func)
-
-    def notify(self, collision: Collision):
-        '''通知註冊了碰撞事件的所有方法，並傳入碰撞資訊(Collision)'''
-        for func in self.on_collide_notify:
-            func(collision)
+    

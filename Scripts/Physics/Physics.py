@@ -28,8 +28,8 @@ class Physics:
     @staticmethod
     def init():
         # FIXME 測試用 切換是否為彈性碰撞
-        EventManager.attach(InputEvent.change_collision_type,
-                            Physics.change_collision_type)
+        EventManager.get(InputEvent.change_collision_type) + \
+            Physics.change_collision_type
 
     @staticmethod
     def set_clock(clock: Clock):

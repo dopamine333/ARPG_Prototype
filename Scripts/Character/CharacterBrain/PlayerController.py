@@ -7,29 +7,26 @@ from Scripts.Character.CharacterBrain.CharacterBrain import CharacterBrain
 
 class PlayerController(CharacterBrain):
     def start(self):
-        EventManager.attach(InputEvent.move_down, self.move_down)
-        EventManager.attach(InputEvent.move_up, self.move_up)
-        EventManager.attach(InputEvent.move_right, self.move_right)
-        EventManager.attach(InputEvent.move_left, self.move_left)
-        EventManager.attach(InputEvent.fire, self.attack)
-        EventManager.attach(InputEvent.jump, self.jump)
-        #EventManager.attach(InputEvent.dash, self.dash)
+        EventManager.get(InputEvent.move_down) + self.move_down
+        EventManager.get(InputEvent.move_up) + self.move_up
+        EventManager.get(InputEvent.move_right) + self.move_right
+        EventManager.get(InputEvent.move_left) + self.move_left
+        EventManager.get(InputEvent.fire) + self.attack
+        EventManager.get(InputEvent.jump) + self.jump
 
     def end(self):
-        EventManager.detach(InputEvent.move_down, self.move_down)
-        EventManager.detach(InputEvent.move_up, self.move_up)
-        EventManager.detach(InputEvent.move_right, self.move_right)
-        EventManager.detach(InputEvent.move_left, self.move_left)
-        EventManager.detach(InputEvent.fire, self.attack)
-        EventManager.detach(InputEvent.jump, self.jump)
-        #EventManager.detach(InputEvent.dash, self.dash)
+        EventManager.get(InputEvent.move_down) - self.move_down
+        EventManager.get(InputEvent.move_up) - self.move_up
+        EventManager.get(InputEvent.move_right) - self.move_right
+        EventManager.get(InputEvent.move_left) - self.move_left
+        EventManager.get(InputEvent.fire) - self.attack
+        EventManager.get(InputEvent.jump) - self.jump
 
     def __init__(self) -> None:
         super().__init__()
         self.movement = Vector2()
         self.do_jump = False
         self.do_attack = False
-        # self.do_dash=False
 
     def update(self):
         if self.movement.xy != (0, 0):

@@ -79,10 +79,10 @@ class CharacterFactory:
             animator = gameobject.add_component(Animator)
             animator.add_animations(*animations.values())
             animator.set_default_animation(animations["Idle"])
-            animations["Dead"].attach(14, gameobject.destroy)
+            animations["Dead"].get_frame_event(14) + gameobject.destroy
             # TODO 註冊動畫事件應該在Character裡 還是在工廠裡
-            animations["Run"].attach(0, hero.play_move_VFX_and_SFX)
-            animations["Run"].attach(8, hero.play_move_VFX_and_SFX)
+            animations["Run"].get_frame_event(0) + hero.play_move_VFX_and_SFX
+            animations["Run"].get_frame_event(8) + hero.play_move_VFX_and_SFX
             animator.add_bool("running", "on_ground", "dead")
             animations["Idle"].set_play_mode(PlayMode.loop)
             animations["Jump"].set_play_mode(PlayMode.once)

@@ -49,7 +49,7 @@ class Character(UnderAttackInterface):
 
     def start(self):
         self.rigidbody = self.get_component(RigidBody)
-        self.rigidbody.attach(self.on_collide)
+        self.rigidbody.on_collide_notify + self.on_collide
         self.hp = self.max_hp
         self.brain.start()
 

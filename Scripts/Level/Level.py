@@ -46,8 +46,7 @@ class Level:
             savepoint.start()
         self.default_savepoint.trigger()
 
-        EventManager.attach(GameEvent.player_dead,
-                            self.back_to_current_savepoint)
+        EventManager.get(GameEvent.player_dead) + self.back_to_current_savepoint
 
     def back_to_current_savepoint(self):
         self.current_checkpoint.resume()
@@ -75,8 +74,7 @@ class Level:
         position = self.levelsystem.gamemanager.get_player().position.xyz
         position.y += 200
         VFXManager.Instance().play(VFXID.finish_level, position)
-        EventManager.detach(GameEvent.player_dead,
-                            self.back_to_current_savepoint)
+        EventManager.get(GameEvent.player_dead) - self.back_to_current_savepoint
 
     def trigger_checkpoint(self):
         # FIXME 進入檢查點視覺提示

@@ -17,7 +17,7 @@ class EnemySystem(GameSystem):
         self.alive_enemies: list[Character] = []
         self.counting_death = False
 
-        EventManager.attach(GameEvent.player_dead, self.clear_enemies)
+        EventManager.get(GameEvent.player_dead) + self.clear_enemies
 
     def generate_enemy(self, enemies: list[tuple[CharacterID, Vector3]]):
         characterfactory = FactoryManager.Instance().get_characterfactory()
@@ -42,7 +42,7 @@ class EnemySystem(GameSystem):
             for del_enemy in to_del:
                 self.alive_enemies.remove(del_enemy)
             if len(self.alive_enemies) == 0:
-                EventManager.notify(GameEvent.enemy_clear)
+                EventManager.get(GameEvent.enemy_clear).notify()
                 self.counting_death = False
 
     def clear_enemies(self):

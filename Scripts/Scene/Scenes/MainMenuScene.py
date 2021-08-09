@@ -32,7 +32,7 @@ class MainMenuScene(Scene):
         game_title_render.set_layer(Layer.UI)
         game_title.set_position((640, 200, 0))
 
-        play_button_button.attach(ButtonEvent.up, self.to_battle)
+        play_button_button.get_button_event(ButtonEvent.up) + self.to_battle
 
         self.add_gameobjects(play_button, game_title)
 

@@ -55,7 +55,7 @@ class BattleScene(Scene):
         to_mainmenu_button_button.set_button_size(to_mainmenu_button_size)
         to_mainmenu_button.set_position((1212, 665, 0))
 
-        to_mainmenu_button_button.attach(ButtonEvent.up, self.to_mainmenu)
+        to_mainmenu_button_button.get_button_event(ButtonEvent.up) + self.to_mainmenu
         self.add_gameobject(to_mainmenu_button)
         # endregion
 
