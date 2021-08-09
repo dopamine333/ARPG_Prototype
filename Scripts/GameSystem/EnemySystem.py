@@ -17,7 +17,7 @@ class EnemySystem(GameSystem):
         self.alive_enemies: list[Character] = []
         self.counting_death = False
 
-        EventManager.attach(GameEvent.player_spawn,self.reset_target)
+        EventManager.attach(GameEvent.player_dead, self.clear_enemies)
 
     def generate_enemy(self, enemies: list[tuple[CharacterID, Vector3]]):
         characterfactory = FactoryManager.Instance().get_characterfactory()
@@ -44,11 +44,13 @@ class EnemySystem(GameSystem):
             if len(self.alive_enemies) == 0:
                 EventManager.notify(GameEvent.enemy_clear)
                 self.counting_death = False
-    def reset_target(self):
+
+    def clear_enemies(self):
         for enemy in self.alive_enemies:
-            brain:EnemyBrain=enemy.brain
-            brain.set_target(self.gamemanager.get_player())
+            enemy.destroy()
+        self.alive_enemies.clear()
+        self.counting_death = False
+
     def enemy_dead(self, enemy: Character):
         # TODO 敵人死亡特效
-        print("enemysystem:enemy dead!")
         enemy.destroy()

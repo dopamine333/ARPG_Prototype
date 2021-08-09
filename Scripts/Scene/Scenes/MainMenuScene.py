@@ -1,3 +1,4 @@
+from Scripts.GameSystem.GameManager import GameManager
 from Scripts.Button.MouseManager import MouseManager
 from Scripts.Graphic.Render.Render import Render
 from Scripts.GameObject.GameObject import GameObject
@@ -39,4 +40,6 @@ class MainMenuScene(Scene):
         MouseManager.update()
 
     def to_battle(self):
+        # FIXME 選擇關卡
+        GameManager.Instance().choice_level(1)
         self.change_scene(Scripts.Scene.Scenes.BattleScene.BattleScene)

@@ -1,13 +1,12 @@
 from __future__ import annotations
-from typing import TypeVar
-
-from Scripts.GameObject.Component import Component
-from typing import Type
+from typing import TypeVar,Type
 from Scripts.Locals import Tag
 from pygame import Vector3
 from Scripts.Scene.SceneManager import SceneManager
 
-ComponentType=TypeVar("ComponentType")
+ComponentType = TypeVar("ComponentType")
+
+
 class GameObject:
     '''
     場景上所有東西皆為遊戲物件(GameObject)和組件(Component)的結合
@@ -23,7 +22,13 @@ class GameObject:
         self.components = []
         self.tag = Tag.default
         self.position = Vector3()
+        '''self.enabled = True
 
+    def set_enabled(self, value: bool):
+        self.enabled = value
+
+    def is_enabled(self):
+        return self.enabled'''
     # region setter
 
     def set_position(self, position: Vector3):
@@ -45,10 +50,13 @@ class GameObject:
             component.end()
 
     def update(self):
+        '''if not self.is_enabled():
+            return'''
         for component in self.components:
+            '''if component.is_enabled():'''
             component.update()
 
-    def add_component(self, component_type:Type[ComponentType])-> ComponentType:
+    def add_component(self, component_type: Type[ComponentType]) -> ComponentType:
         '''新增並回傳一個組件(Component)，並與此遊戲物件綁定'''
         component = component_type()
         component.gameobject = self
@@ -56,7 +64,7 @@ class GameObject:
         self.components.append(component)
         return component
 
-    def get_component(self, component_type:Type[ComponentType])->ComponentType:
+    def get_component(self, component_type: Type[ComponentType]) -> ComponentType:
         '''回傳一個組件(Component)，如果該組件的類別為輸入類別或輸入的子類'''
         for component in self.components:
             if isinstance(component, component_type):
@@ -65,7 +73,7 @@ class GameObject:
 
     def compare_tag(self, tag: Tag):
         '''回傳此遊戲物件的標籤(tag)是否為輸入'''
-        return self.tag == tag
+        return self.tag in tag
 
     def destroy(self):
         '''銷毀此遊戲物件並從場景(Scene)上移除'''
@@ -74,3 +82,6 @@ class GameObject:
     def instantiate(self):
         '''新增此遊戲物件到場景(Scene)上'''
         SceneManager.current_scene.instantiate_gameobject(self)
+
+    '''def dont_destroy_on_load(self):
+        SceneManager.dont_destroy_on_load(self)'''

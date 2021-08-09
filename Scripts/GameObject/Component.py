@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
-    from Scripts.GameObject.GameObject import GameObject,ComponentType
+    from Scripts.GameObject.GameObject import GameObject, ComponentType
 
 from pygame import Vector3
 from Scripts.Locals import Tag
@@ -22,11 +22,19 @@ class Component:
         self.gameobject: GameObject = None
         self.position: Vector3 = None
 
-    def add_component(self, component_type:Type[ComponentType])->ComponentType:
+        '''self.enabled = True
+
+    def set_enabled(self, value: bool):
+        self.enabled = value
+
+    def is_enabled(self):
+        return self.enabled'''
+
+    def add_component(self, component_type: Type[ComponentType]) -> ComponentType:
         '''新增並回傳一個組件(Component)，並與此組件的遊戲物件綁定'''
         return self.gameobject.add_component(component_type)
 
-    def get_component(self, component_type:Type[ComponentType])->ComponentType:
+    def get_component(self, component_type: Type[ComponentType]) -> ComponentType:
         '''回傳一個在此組件的遊戲物件上其他組件(Component)，如果該組件的類別為輸入類別或輸入的子類'''
         return self.gameobject.get_component(component_type)
 

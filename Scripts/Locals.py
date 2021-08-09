@@ -1,5 +1,4 @@
 from enum import Enum, Flag, auto
-from os import remove
 
 from pygame import Vector3
 
@@ -26,8 +25,8 @@ class ForceMode(Enum):
 
 
 class GameEvent(Enum):
-    enemy_clear=0
-    player_spawn=1
+    enemy_clear = 0  # 場上沒有敵人時
+    player_dead = 1  # 玩家死亡時
 
 
 class InputEvent(Enum):
@@ -39,50 +38,73 @@ class InputEvent(Enum):
     move_right = 3
     jump = 4
     fire = 5
-    dash=9
+    dash = 9
     change_collision_type = 8
 
 
-class Tag(Enum):
+class Tag(Flag):
     default = auto()
     player = auto()
     enemy = auto()
+    interactable = auto()  # 玩家可以攻擊/互動的
+
+
 class CharacterID(Enum):
-    Hero=0
-    Slime=1
-    GoblinFighter=2
-    GoblinShooter=3
-    GoblinKing=4
+    hero = 0
+    slime = 1
+    goblin_fighter = 2
+    goblin_shooter = 3
+    goblin_king = 4
+
+
+class OnLevelGameObjectID(Enum):
+    goldsword = 0  # 存檔點標記
+    coin_bait = 1  # 檢查點標記
+    chest = 2
+
+
 class MusicID(Enum):
     pass
-class SFXID(Enum):
-    hero_move=auto()
-    hero_jump=auto()
-    hero_landing=auto()
-    hero_attack=auto()
-    hero_underattack=auto()
-    hero_dead=auto()
 
-    #slime_move=auto()
-    slime_jump=auto()
-    slime_landing=auto()
-    #slime_attack=auto()
-    slime_underattack=auto()
-    slime_dead=auto()
+
+class SFXID(Enum):
+    hero_move = auto()
+    hero_jump = auto()
+    hero_landing = auto()
+    hero_attack = auto()
+    hero_underattack = auto()
+    hero_dead = auto()
+
+    # slime_move=auto()
+    slime_jump = auto()
+    slime_landing = auto()
+    # slime_attack=auto()
+    slime_underattack = auto()
+    slime_dead = auto()
+
 
 class VFXID(Enum):
-    hero_move=auto()
-    hero_jump=auto()
-    hero_landing=auto()
-    hero_attack=auto()
-    hero_underattack=auto()
-    hero_dead=auto()
+    hero_move = auto()
+    hero_jump = auto()
+    hero_landing = auto()
+    hero_attack = auto()
+    hero_underattack = auto()
+    hero_dead = auto()
 
-    slime_jump=auto()
-    slime_landing=auto()
-    slime_attack=auto()
-    slime_underattack=auto()
-    slime_dead=auto()
+    slime_jump = auto()
+    slime_landing = auto()
+    slime_attack = auto()
+    slime_underattack = auto()
+    slime_dead = auto()
+
+    finish_level = auto()
+    finish_checkpoint = auto()
+    trigger_checkpoint = auto()
+    trigger_savepoint = auto()
+
+    goldsword_trigger = auto()
+    goldsword_shake = auto()
+
     '''
     move=auto()
     jump=auto()
@@ -91,7 +113,7 @@ class VFXID(Enum):
     underattack=auto()
     dead=auto()
     '''
-    
+
 
 class PlayMode(Enum):
     once = 0

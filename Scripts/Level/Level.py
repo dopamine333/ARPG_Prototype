@@ -1,16 +1,17 @@
 from __future__ import annotations
-from random import random
 from typing import TYPE_CHECKING
-
-from pygame.draw import circle
 if TYPE_CHECKING:
     from Scripts.Level.LevelSystem import LevelSystem
+from Scripts.VFXManager.VFXManager import VFXManager
+from random import random
+from Scripts.EventManager.EventManager import EventManager
+from pygame.draw import circle
 
 from pygame import Surface, Vector3, mouse
 from pygame.image import load
 from pygame.transform import scale
 from Scripts.Graphic.Image import Image
-from Scripts.Locals import CharacterID, Tag
+from Scripts.Locals import CharacterID, GameEvent, Tag, VFXID
 from Scripts.Physics.Physics import Physics
 from Scripts.Graphic.RenderManager import RenderManager
 from Scripts.Level.CheckPoint import Checkpoint
@@ -30,18 +31,30 @@ class Level:
 
     def set_levelsystem(self, levelsystem: LevelSystem):
         self.levelsystem = levelsystem
-    
-    def start(self):
+
+    def start_level(self):
         self.bg_sketch = Surface((14000, 200))
         self.bg_sketch.fill((204, 154, 15))
         for _ in range(1000):
-            circle(self.bg_sketch,(random()*255,random()*20,random()*255),(random()*14000,random()*200),random()*30+5)
+            circle(self.bg_sketch, (random()*30+200, random()*30+150,
+                   random()*30+10), (random()*14000, random()*200), random()*30+5)
 
         self.current_checkpoint.detect()
-        self.current_checkpoint.apply_physics_activity_box(self.current_checkpoint.physics_activity_box)
-        self.current_checkpoint.apply_render_activity_rect(self.current_checkpoint.render_activity_rect)
+        self.current_checkpoint.apply_self_activity_range()
 
-        self.current_savepoint = self.default_savepoint
+        for savepoint in self.savepoints:
+            savepoint.start()
+        self.default_savepoint.trigger()
+
+        EventManager.attach(GameEvent.player_dead,
+                            self.back_to_current_savepoint)
+
+    def back_to_current_savepoint(self):
+        self.current_checkpoint.resume()
+        self.current_checkpoint = self.current_savepoint.get_current_checkpoint()
+
+        self.current_checkpoint.detect()
+        self.current_checkpoint.apply_self_activity_range()
 
     def update(self):
         self.current_checkpoint.update()
@@ -51,14 +64,38 @@ class Level:
             Image(self.bg_sketch, (0, 0)), Vector3(0, 0, 400))
 
     def finish_checkpoint(self):
-        print("level:finish_checkpoint")
+        # FIXME 完成檢查點視覺提示
+        position = self.levelsystem.gamemanager.get_player().position.xyz
+        position.y += 200
+        VFXManager.Instance().play(VFXID.finish_checkpoint, position)
         self.current_checkpoint = self.current_checkpoint.next_checkpoint
 
     def finish_level(self):
         # TODO 結束關卡通知
-        print("level:finish_level")
+        position = self.levelsystem.gamemanager.get_player().position.xyz
+        position.y += 200
+        VFXManager.Instance().play(VFXID.finish_level, position)
+        EventManager.detach(GameEvent.player_dead,
+                            self.back_to_current_savepoint)
+
+    def trigger_checkpoint(self):
+        # FIXME 進入檢查點視覺提示
+        position = self.current_checkpoint.trigger_box_sketch_position.xyz
+        position.y += 200
+        VFXManager.Instance().play(VFXID.trigger_checkpoint, position)
+
+    def trigger_savepoint(self, savepoint: SavePoint):
+        # FIXME 觸發存檔點視覺提示
+        position = savepoint.goldsword.position.xyz
+        position.y += 200
+        VFXManager.Instance().play(VFXID.trigger_savepoint, position)
+        self.current_savepoint = savepoint
+
     def generate_enemy(self, enemies: list[tuple[CharacterID, Vector3]]):
         self.levelsystem.generate_enemy(enemies)
+
+    def get_current_checkpoint(self):
+        return self.current_checkpoint
     # region add checkpoints and savepoints
 
     def add_checkpoints(self, *checkpoints: Checkpoint):
@@ -70,15 +107,15 @@ class Level:
         if self.current_checkpoint:
             self.current_checkpoint.add_checkpoint(checkpoint)
         else:
-            self.current_checkpoint=checkpoint
-        
+            self.current_checkpoint = checkpoint
 
     def add_savepoints(self, *savepoints: SavePoint):
-        self.savepoints.extend(savepoints)
+        for savepoint in savepoints:
+            self.add_savepoint(savepoint)
 
     def add_savepoint(self, savepoint: SavePoint):
+        savepoint.set_level(self)
         self.savepoints.append(savepoint)
-        self.default_savepoint
 
     def set_default_savepoint(self, default_savepoint: SavePoint):
         self.default_savepoint = default_savepoint

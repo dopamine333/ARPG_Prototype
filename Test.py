@@ -1,5 +1,7 @@
-x=0
-print(1) \
-    if 1 == 1 \
-    else x=10
-print(x)
+def ppp(m, *ws):
+    print(m)
+    print(ws)
+
+
+ppp("od", 1, 3, 5, 5)
+ppp("ddd")

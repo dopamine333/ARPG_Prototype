@@ -16,11 +16,10 @@ class PlayerSystem(GameSystem):
     def __init__(self, gamemanager: GameManager) -> None:
         super().__init__(gamemanager)
 
-        self.player_characterID = CharacterID.Hero
+        self.player_characterID = CharacterID.hero
         self.alive_player: Character = None
 
-    
-    def start(self):
+    def start_game(self):
         self.spawn_player()
 
     def spawn_player(self):
@@ -32,11 +31,13 @@ class PlayerSystem(GameSystem):
         player.gameobject.instantiate()
         self.alive_player = player
 
-        RenderManager.camera.get_component(CameraController).set_target(player.position)
-        EventManager.notify(GameEvent.player_spawn)
+        RenderManager.camera.get_component(
+            CameraController).set_target(player.position)
+
     def update(self):
         if self.alive_player.is_dead:
+            EventManager.notify(GameEvent.player_dead)
             self.spawn_player()
-            
+
     def get_player(self) -> Character:
         return self.alive_player

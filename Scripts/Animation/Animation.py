@@ -1,11 +1,14 @@
+from __future__ import annotations
 
-from collections import defaultdict
 from typing import Callable
 from pygame import Rect, Surface, Vector2
 import pygame
+
 from Scripts.Graphic.Image import Image
+
 from Scripts.Animation.Animator import Animator
 from Scripts.Animation.Transition import Transition
+
 from Scripts.Locals import PlayMode
 
 
@@ -86,21 +89,32 @@ class Animation:
     def set_play_mode(self, play_mode: PlayMode):
         self.play_mode = play_mode
 
-    def add_transition(self, transition: Transition):
+    def add_transition(self, to_animation: Animation, must_play_over: bool = True, *conditions:  tuple[tuple[str, bool], ...]):
+        '''
+        創建一個動畫轉換 可添加條件
+        to_animation : 目標動畫
+        must_play_over : 一定要播完才能轉換動畫嗎
+        conditions : (參數名稱 , 條件值) 
+        '''
+        transition = Transition(to_animation, must_play_over)
+        if len(conditions) != 0:
+            transition.add_condition(*conditions)
         transition.animator = self.animator
         self.transitions.append(transition)
 
     def use_sprite_sheet(self, sprite_sheet: Surface, start_left_top: Vector2, size: Vector2, center: Vector2, lenght: int):
         '''使用精靈圖表(sprite_sheet)設定動畫片段'''
-        self.set_clip(self.generate_clip_use_sprite_sheet(sprite_sheet,start_left_top,size,center,lenght))
+        self.set_clip(self.generate_clip_use_sprite_sheet(
+            sprite_sheet, start_left_top, size, center, lenght))
+
     @staticmethod
     def generate_clip_use_sprite_sheet(sprite_sheet: Surface, start_left_top: Vector2, size: Vector2, center: Vector2, lenght: int):
         '''使用精靈圖表(sprite_sheet)生成動畫片段'''
-        clip: list[Image]=[]
-        size=Vector2(size)
+        clip: list[Image] = []
+        size = Vector2(size)
         source_rect = Rect(start_left_top, size)
         for _ in range(lenght):
-            source = Surface(size,pygame.SRCALPHA)
+            source = Surface(size, pygame.SRCALPHA)
             source.blit(sprite_sheet, (0, 0), source_rect)
             clip.append(Image(source, center))
 

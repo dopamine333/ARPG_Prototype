@@ -2,18 +2,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Character.CharacterBrain.CharacterBrain import CharacterBrain
+    from Scripts.Physics.Collision import Collision
+    from Scripts.Attack.AttackParam import AttackParam
+from Scripts.Attack.UnderAttackInterface import UnderAttackInterface
 from Scripts.Tools.Buffer import Buffer
-from Scripts.Physics.Collision import Collision
-from Scripts.Locals import Face, ForceMode
-from Scripts.Attack.AttackParam import AttackParam
+from Scripts.Locals import ForceMode
 from Scripts.Physics.RigidBody import RigidBody
-from pygame import Vector2, Vector3
-from Scripts.GameObject.Component import Component
 
 # TODO 衝刺
 
 
-class Character(Component):
+class Character(UnderAttackInterface):
     '''
     場景上打來打去的角色
 
@@ -38,11 +37,11 @@ class Character(Component):
 
         self.rigidbody: RigidBody = None
         self.brain: CharacterBrain = None
-        self.buffer=Buffer()
-        self.invincible_time=0.5
-        self.max_hp=10
-        self.hp=self.max_hp
-        self.is_dead=False
+        self.buffer = Buffer()
+        self.invincible_time = 0.5
+        self.max_hp = 10
+        self.hp = self.max_hp
+        self.is_dead = False
 
     def set_brain(self, brain: CharacterBrain):
         self.brain = brain
@@ -69,7 +68,10 @@ class Character(Component):
     def under_attack(self, attack_param: AttackParam):
         if self.buffer.get("invincible"):
             return
-        self.buffer.set("invincible",self.invincible_time)
+        self.buffer.set("invincible", self.invincible_time)
+        self.take_damage(attack_param)
+
+    def take_damage(self, attack_param: AttackParam):
         self.rigidbody.add_force(attack_param.force, ForceMode.impulse)
         attack_param.set_defender(self)
         attack_param.show()
@@ -78,5 +80,5 @@ class Character(Component):
             self.dead()
 
     def dead(self):
-        self.is_dead=True
+        self.is_dead = True
         self.destroy()
