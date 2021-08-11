@@ -54,23 +54,37 @@ class Button(Component):
 
         if mouse_over:
             if not(self.mouse_pressed) and mouse_pressed:
-                self.notify(ButtonEvent.down)
+                self.down()
             if self.mouse_pressed and mouse_pressed:
-                self.notify(ButtonEvent.drag)
+                self.drag()
             if self.mouse_pressed and not(mouse_pressed):
-                self.notify(ButtonEvent.up)
+                self.up()
         if not(self.mouse_over) and mouse_over:
-            self.notify(ButtonEvent.enter)
+            self.enter()
         if self.mouse_over and mouse_over:
-            self.notify(ButtonEvent.over)
+            self.over()
         if self.mouse_over and not(mouse_over):
-            self.notify(ButtonEvent.exit)
+            self.exit()
 
         self.mouse_over = mouse_over
         self.mouse_pressed = mouse_pressed
 
         return mouse_over
-        
+
+    def down(self):
+        self.notify(ButtonEvent.down)
+    def drag(self):
+        self.notify(ButtonEvent.drag)
+    def up(self):
+        self.notify(ButtonEvent.up)
+    def enter(self):
+        self.notify(ButtonEvent.enter)
+    def over(self):
+        self.notify(ButtonEvent.over)
+    def exit(self):
+        self.notify(ButtonEvent.exit)
+
+
     def get_button_event(self,button_event: ButtonEvent):
         if not button_event in self.button_events:
             self.button_events[button_event] = Action()

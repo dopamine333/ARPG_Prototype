@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Physics.Collision import Collision
 
+from Scripts.Time.Time import Time
 from Scripts.Physics.Collider import Collider
 from Scripts.Physics.Physics import Physics
 from Scripts.GameObject.Component import Component
@@ -10,6 +11,7 @@ from Scripts.Locals import Face, ForceMode, GRAVITY
 from pygame import Vector3
 
 from Scripts.Tools.Action import Action
+
 
 class RigidBody(Component):
     '''
@@ -34,13 +36,12 @@ class RigidBody(Component):
         self.velocity = Vector3()
         self.acceleration = Vector3()
         self.surfaces: dict[Face, float] = {}
-        self.on_collide_notify=Action()
+        self.on_collide_notify = Action()
 
     # region setter
 
     def set_collider(self, collider_size: Vector3, collider_center: Vector3):
         self.collider = Collider(collider_size, collider_center)
-        # TODO daojdoiasjdoisjoid
         self.update_surface(Face.all)
 
     def set_frozen(self, frozen: bool):
@@ -63,6 +64,8 @@ class RigidBody(Component):
 
     def update(self):
         # 更新物理
+        if Time.is_paused():
+            return
         if self.frozen:
             self.velocity.xyz = (0, 0, 0)
             return
@@ -70,7 +73,7 @@ class RigidBody(Component):
             self.add_force(GRAVITY, ForceMode.force)
         self.velocity += self.acceleration
         self.velocity *= self.damp
-        self.position += self.velocity*Physics.get_deltatime()  # 時間校正
+        self.position += self.velocity*Time.get_deltatime()  # 時間校正
         self.acceleration.xyz = (0, 0, 0)
 
         self.update_surface(Face.all)
@@ -89,7 +92,7 @@ class RigidBody(Component):
         ForceMode.impulse ->  施加一個瞬間的力時選擇
         '''
         if force_mode == ForceMode.force:
-            self.acceleration += Vector3(force)*Physics.get_deltatime()  # 時間校正
+            self.acceleration += Vector3(force)*Time.get_deltatime()  # 時間校正
         if force_mode == ForceMode.impulse:
             self.acceleration += Vector3(force)
 
@@ -141,5 +144,3 @@ class RigidBody(Component):
 
     def on_collide(self, collision: Collision):
         self.on_collide_notify.notify(collision)
-
-    

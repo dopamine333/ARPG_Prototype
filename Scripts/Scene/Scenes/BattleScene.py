@@ -2,6 +2,7 @@ from Scripts.GameSystem.GameManagerRunner import GameManagerRunner
 
 from Scripts.Camera.CameraController import CameraController
 from Scripts.Camera.Camera import Camera
+from Scripts.Button.SwitchButton import SwitchButton
 from Scripts.Button.MouseManager import MouseManager
 from Scripts.Button.Button import Button
 from Scripts.GameObject.GameObject import GameObject
@@ -12,7 +13,9 @@ from Scripts.Graphic.RenderManager import RenderManager
 from Scripts.Physics.Physics import Physics
 from Scripts.Physics.Box import Box
 from Scripts.Physics.RigidBody import RigidBody
-from Scripts.Locals import ButtonEvent, Layer
+
+from Scripts.Time.Time import Time
+from Scripts.Locals import ButtonEvent, Layer, SwitchButtonEvent
 from pygame.image import load
 import pygame
 import Scripts.Scene.Scenes.MainMenuScene
@@ -55,8 +58,27 @@ class BattleScene(Scene):
         to_mainmenu_button_button.set_button_size(to_mainmenu_button_size)
         to_mainmenu_button.set_position((1212, 665, 0))
 
+        to_mainmenu_button_button.get_button_event(ButtonEvent.up) + Time.resume
         to_mainmenu_button_button.get_button_event(ButtonEvent.up) + self.to_mainmenu
         self.add_gameobject(to_mainmenu_button)
+        # endregion
+
+        # region pause_button
+        #TODO 暫停按鈕動畫
+        pause_button_source = load(
+            r"Arts\UI\Icon\pause_icon.png").convert_alpha()
+        pause_button_size = pause_button_source.get_size()
+        pause_button = GameObject()
+        pause_button_render = pause_button.add_component(Render)
+        pause_button_button = pause_button.add_component(SwitchButton)
+        pause_button_render.set_image(Image(pause_button_source))
+        pause_button_render.set_layer(Layer.UI)
+        pause_button_button.set_button_size(pause_button_size)
+        pause_button.set_position((1200, 20, 0))
+
+        pause_button_button.get_switch_button_event(SwitchButtonEvent.close) + Time.pause
+        pause_button_button.get_switch_button_event(SwitchButtonEvent.open) + Time.resume
+        self.add_gameobject(pause_button)
         # endregion
 
         # region camera
@@ -82,7 +104,6 @@ class BattleScene(Scene):
 
     def scene_update(self):
         MouseManager.update()
-        Physics.update()
 
     def scene_end(self):
         RenderManager.set_camera(None)

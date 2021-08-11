@@ -22,27 +22,12 @@ class Physics:
     rigidbodies: list[RigidBody] = []
     elastic = True
     activity_box: Box = None
-    lastframetime = time()
-    deltatime = 0
 
     @staticmethod
     def init():
         # FIXME 測試用 切換是否為彈性碰撞
         EventManager.get(InputEvent.change_collision_type) + \
             Physics.change_collision_type
-
-    @staticmethod
-    def set_clock(clock: Clock):
-        Physics.clock = clock
-
-    @staticmethod
-    def update():
-        if len(Physics.rigidbodies) != 0:
-            Physics.deltatime = Physics.clock.get_time()*0.001
-
-    @staticmethod
-    def get_deltatime():
-        return Physics.deltatime
 
     @staticmethod
     def change_collision_type():

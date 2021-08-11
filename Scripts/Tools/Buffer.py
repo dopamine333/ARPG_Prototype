@@ -1,24 +1,22 @@
-from time import time
+from Scripts.Time.Time import Time
+
+
 class Buffer:
     def __init__(self) -> None:
         self.items: dict[str, float] = {}
-        self.lasttime = 0
 
     def update(self):
-        deltatime = time()-self.lasttime
-        self.lasttime = time()
-
         to_del = []
         for name in self.items.keys():
             if self.items[name] <= 0:
                 to_del.append(name)
                 continue
-            self.items[name] -= deltatime
+            self.items[name] -= Time.get_deltatime()
         for name in to_del:
             del self.items[name]
 
     def set(self, name: str, timeleft: float):
-        if timeleft>0:
+        if timeleft > 0:
             self.items[name] = timeleft
 
     def get(self, name: str):

@@ -14,8 +14,8 @@ class Scene:
 
     def __init__(self) -> None:
         self.gameobjects: list[GameObject] = []
-        self.to_del_gameobjects: list[GameObject] = []
-        self.to_add_gameobjects: list[GameObject] = []
+        self.to_destroy_gameobjects: list[GameObject] = []
+        self.to_instantiate_gameobjects: list[GameObject] = []
 
     def add_gameobject(self, gameobject: GameObject):
         self.gameobjects.append(gameobject)
@@ -24,12 +24,15 @@ class Scene:
         self.gameobjects.extend(gameobjects)
 
     def instantiate_gameobject(self, gameobject: GameObject):
-        self.to_add_gameobjects.append(gameobject)
+        self.to_instantiate_gameobjects.append(gameobject)
         gameobject.start()
 
     def destroy_gameobject(self, gameobject: GameObject):
+        if gameobject in self.to_destroy_gameobjects or \
+           gameobject not in self.gameobjects:
+            return
+        self.to_destroy_gameobjects.append(gameobject)
         gameobject.end()
-        self.to_del_gameobjects.append(gameobject)
 
     def scene_start(self):
         '''在start前執行'''
@@ -52,15 +55,16 @@ class Scene:
             gameobject.end()
 
     def update(self):
-        if len(self.to_add_gameobjects)>0:
-            self.gameobjects.extend(self.to_add_gameobjects)
-            self.to_add_gameobjects.clear()
+        if len(self.to_instantiate_gameobjects) > 0:
+            self.gameobjects.extend(self.to_instantiate_gameobjects)
+            self.to_instantiate_gameobjects.clear()
 
         for gameobject in self.gameobjects:
             gameobject.update()
-        for del_gameobject in self.to_del_gameobjects:
+
+        for del_gameobject in self.to_destroy_gameobjects:
             self.gameobjects.remove(del_gameobject)
-        self.to_del_gameobjects.clear()
+        self.to_destroy_gameobjects.clear()
 
     def change_scene(self, new_scene_name: type[Scene]):
         SceneManager.change(new_scene_name())

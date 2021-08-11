@@ -1,3 +1,4 @@
+from Scripts.Time.Time import Time
 from Scripts.Physics.Physics import Physics
 from Scripts.Button.MouseManager import MouseManager
 from Scripts.Graphic.RenderManager import RenderManager
@@ -25,12 +26,11 @@ class GameLoop:
 
         self.screen = pygame.display.set_mode((1280, 720))
         self.screen_size = Vector2(self.screen.get_size())
-        self.clock = pygame.time.Clock()
+        Time.set_target_fps(60)
 
         self.input_manager = InputManager()
         MouseManager.init()
         Physics.init()
-        Physics.set_clock(self.clock)
         RenderManager.set_screen(self.screen)
 
     def run(self):
@@ -40,8 +40,8 @@ class GameLoop:
         running = True
         while running:
             # 固定幀率(Frame Per Second; fps)為60
-            self.clock.tick(60)
-            #print(self.clock.get_fps())
+            Time.tick()
+            # print(self.clock.get_fps())
             self.update()
             self.draw()
             pygame.display.update()

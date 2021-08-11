@@ -1,5 +1,5 @@
+from Scripts.Time.Time import Time
 from Scripts.GameObject.Component import Component
-from time import time
 
 
 class LifeTimer(Component):
@@ -11,16 +11,13 @@ class LifeTimer(Component):
     屬性:
         +lifetime: float
     '''
+
     def __init__(self) -> None:
         super().__init__()
         self.lifetime = 0
 
     def start(self):
-        self.birthtime = time()
+        Time.invoke(self.destroy, self.lifetime)
 
     def set_lifetime(self, lifetime: float):
         self.lifetime = lifetime
-
-    def update(self):
-        if self.birthtime+self.lifetime < time():
-            self.destroy()

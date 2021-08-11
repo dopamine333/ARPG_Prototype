@@ -7,16 +7,14 @@ from random import random
 from Scripts.EventManager.EventManager import EventManager
 from pygame.draw import circle
 
-from pygame import Surface, Vector3, mouse
-from pygame.image import load
-from pygame.transform import scale
+from pygame import Surface, Vector3
 from Scripts.Graphic.Image import Image
-from Scripts.Locals import CharacterID, GameEvent, Tag, VFXID
-from Scripts.Physics.Physics import Physics
+from Scripts.Locals import CharacterID, GameEvent, VFXID
 from Scripts.Graphic.RenderManager import RenderManager
 from Scripts.Level.CheckPoint import Checkpoint
 from Scripts.Level.SavePoint import SavePoint
 
+#FIXME 退出戰鬥狀態後要重製關卡
 
 class Level:
     def __init__(self) -> None:
@@ -26,6 +24,7 @@ class Level:
         self.current_savepoint: SavePoint = None
 
         self.default_savepoint: SavePoint = None
+        self.default_checkpoint: Checkpoint = None
 
         self.levelsystem: LevelSystem = None
 
@@ -39,6 +38,7 @@ class Level:
             circle(self.bg_sketch, (random()*30+200, random()*30+150,
                    random()*30+10), (random()*14000, random()*200), random()*30+5)
 
+        self.current_checkpoint = self.default_checkpoint
         self.current_checkpoint.detect()
         self.current_checkpoint.apply_self_activity_range()
 
@@ -46,7 +46,8 @@ class Level:
             savepoint.start()
         self.default_savepoint.trigger()
 
-        EventManager.get(GameEvent.player_dead) + self.back_to_current_savepoint
+        EventManager.get(GameEvent.player_dead) + \
+            self.back_to_current_savepoint
 
     def back_to_current_savepoint(self):
         self.current_checkpoint.resume()
@@ -74,7 +75,8 @@ class Level:
         position = self.levelsystem.gamemanager.get_player().position.xyz
         position.y += 200
         VFXManager.Instance().play(VFXID.finish_level, position)
-        EventManager.get(GameEvent.player_dead) - self.back_to_current_savepoint
+        EventManager.get(GameEvent.player_dead) - \
+            self.back_to_current_savepoint
 
     def trigger_checkpoint(self):
         # FIXME 進入檢查點視覺提示
@@ -102,10 +104,10 @@ class Level:
 
     def add_checkpoint(self, checkpoint: Checkpoint):
         checkpoint.set_level(self)
-        if self.current_checkpoint:
-            self.current_checkpoint.add_checkpoint(checkpoint)
+        if self.default_checkpoint:
+            self.default_checkpoint.add_checkpoint(checkpoint)
         else:
-            self.current_checkpoint = checkpoint
+            self.default_checkpoint = checkpoint
 
     def add_savepoints(self, *savepoints: SavePoint):
         for savepoint in savepoints:

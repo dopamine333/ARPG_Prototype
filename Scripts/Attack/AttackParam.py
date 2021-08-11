@@ -3,19 +3,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Character.Character import Character
 from Scripts.VFXManager.VFXManager import VFXManager
-from Scripts.Animation.Animation import Animation
-from Scripts.Animation.Animator import Animator
 from random import random
 from Scripts.Locals import Tag
-from Scripts.Time.LifeTimer import LifeTimer
 from Scripts.Graphic.Image import Image
-from Scripts.Graphic.Render.SpriteRender import SpriteRender
-from Scripts.GameObject.GameObject import GameObject
-from Scripts.Physics import RigidBody
-from pygame import Color, Vector2, Vector3, image, mouse
-import pygame.font
-
-# TODO 播放攻擊音效
+from pygame import Vector3
 
 
 class AttackParam:
@@ -40,7 +31,6 @@ class AttackParam:
 
     def set_defender(self, defender: Character):
         self.defender = defender
-    # TODO 也許能做一個Timer，統一管理計時的類
 
     def show(self):
         position = (self.attacker.position+self.defender.position)/2 \

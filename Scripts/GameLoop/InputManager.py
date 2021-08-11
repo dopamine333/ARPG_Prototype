@@ -1,7 +1,6 @@
-from random import uniform
 
+from Scripts.Time.Time import Time
 from pygame import mouse
-from Scripts.Button.MouseManager import MouseManager
 from Scripts.Locals import InputEvent
 import pygame
 import pygame.event
@@ -27,6 +26,8 @@ class InputManager:
         '''
         處理｢按住｣的事件
         '''
+        if Time.is_paused():
+            return
         # WASD或上下左右件都能觸發移動事件
         key_input = pygame.key.get_pressed()
         if key_input[pygame.K_w]:
@@ -50,6 +51,8 @@ class InputManager:
         '''
         處理｢按下｣的事件
         '''
+        if Time.is_paused():
+            return
         # J或滑鼠左鍵攻擊
         # K或空白鍵跳躍
         if event.type == pygame.KEYDOWN:

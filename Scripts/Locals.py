@@ -133,6 +133,9 @@ class Layer(Enum):
     UI = auto()
     gizmo = auto
 
+class SwitchButtonEvent(Enum):
+    close=0
+    open=1
 
 class ButtonEvent(Enum):
     down = 0
@@ -141,7 +144,6 @@ class ButtonEvent(Enum):
     over = 3
     up = 4
     drag = 5
-
 
 class CursorState(Enum):
     normal = 0
