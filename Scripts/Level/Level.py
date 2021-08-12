@@ -14,7 +14,6 @@ from Scripts.Graphic.RenderManager import RenderManager
 from Scripts.Level.CheckPoint import Checkpoint
 from Scripts.Level.SavePoint import SavePoint
 
-#FIXME 退出戰鬥狀態後要重製關卡
 
 class Level:
     def __init__(self) -> None:
@@ -31,7 +30,7 @@ class Level:
     def set_levelsystem(self, levelsystem: LevelSystem):
         self.levelsystem = levelsystem
 
-    def start_level(self):
+    def init(self):
         self.bg_sketch = Surface((14000, 200))
         self.bg_sketch.fill((204, 154, 15))
         for _ in range(1000):
@@ -39,22 +38,27 @@ class Level:
                    random()*30+10), (random()*14000, random()*200), random()*30+5)
 
         self.current_checkpoint = self.default_checkpoint
+
+        for savepoint in self.savepoints:
+            savepoint.init()
+
+    def start(self):
         self.current_checkpoint.detect()
         self.current_checkpoint.apply_self_activity_range()
 
-        for savepoint in self.savepoints:
-            savepoint.start()
         self.default_savepoint.trigger()
 
-        EventManager.get(GameEvent.player_dead) + \
-            self.back_to_current_savepoint
+        EventManager.get(GameEvent.player_dead) + self.restart
 
-    def back_to_current_savepoint(self):
+    def restart(self):
         self.current_checkpoint.resume()
         self.current_checkpoint = self.current_savepoint.get_current_checkpoint()
 
         self.current_checkpoint.detect()
         self.current_checkpoint.apply_self_activity_range()
+
+    def release(self):
+        self.current_checkpoint.resume()
 
     def update(self):
         self.current_checkpoint.update()
@@ -75,8 +79,7 @@ class Level:
         position = self.levelsystem.gamemanager.get_player().position.xyz
         position.y += 200
         VFXManager.Instance().play(VFXID.finish_level, position)
-        EventManager.get(GameEvent.player_dead) - \
-            self.back_to_current_savepoint
+        EventManager.get(GameEvent.player_dead) - self.restart
 
     def trigger_checkpoint(self):
         # FIXME 進入檢查點視覺提示

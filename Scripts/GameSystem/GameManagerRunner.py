@@ -8,7 +8,11 @@ class GameManagerRunner(Component):
         self.gamemanager = GameManager.Instance()
 
     def start(self):
-        self.gamemanager.start_game()
+        self.gamemanager.init()
+        self.gamemanager.start()
 
     def update(self):
         self.gamemanager.update()
+
+    def on_destroy(self):
+        self.gamemanager.release()

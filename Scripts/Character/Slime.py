@@ -26,8 +26,8 @@ class Slime(Character):
         self.can_jump_since_exit_ground_time = 0.05
         self.can_jump_before_enter_ground_time = 0.05
 
-        self.move_cd = 2.5+0.8*random()
-        self.jump_cd = 0.5
+        self.move_cd = 4+0.8*random()
+        self.jump_cd = 1.5
 
         self.collide_damage = 2
 
@@ -45,8 +45,8 @@ class Slime(Character):
 
         self.animator: Animator = None
 
-    def start(self):
-        super().start()
+    def awake(self):
+        super().awake()
         self.animator = self.get_component(Animator)
         self.rigidbody.set_damp(0.93)
 

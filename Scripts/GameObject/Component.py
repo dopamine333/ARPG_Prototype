@@ -42,13 +42,28 @@ class Component:
         '''回傳此組件的遊戲物件標籤(tag)是否為輸入'''
         return self.gameobject.compare_tag(tag)
 
+    def awake(self):
+        pass
+    
     def start(self):
         pass
 
-    def end(self):
+    def physics_update(self):
         pass
 
     def update(self):
+        pass
+
+    def animation_update(self):
+        pass
+
+    def late_update(self):
+        pass
+
+    def on_will_render_object(self):
+        pass
+
+    def on_destroy(self):
         pass
 
     def destroy(self):

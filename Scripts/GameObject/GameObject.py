@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import TypeVar,Type
+from typing import TypeVar, Type
 from Scripts.Locals import Tag
 from pygame import Vector3
 from Scripts.Scene.SceneManager import SceneManager
 
-ComponentType = TypeVar("ComponentType")
+from Scripts.GameObject.Component import Component
+ComponentType = TypeVar("ComponentType", bound=Component)
 
 
 class GameObject:
@@ -19,7 +20,7 @@ class GameObject:
     '''
 
     def __init__(self) -> None:
-        self.components = []
+        self.components: list[Component] = []
         self.tag = Tag.default
         self.position = Vector3()
         '''self.enabled = True
@@ -39,15 +40,18 @@ class GameObject:
 
     # endregion
 
+    def awake(self):
+        for component in self.components:
+            component.awake()
+
     def start(self):
         '''當場景(Scene)開始或此遊戲物件加入場景(instantiate)時呼叫'''
         for component in self.components:
             component.start()
 
-    def end(self):
-        '''當場景(Scene)結束或此遊戲物件銷毀(destroy)時呼叫'''
+    def physics_update(self):
         for component in self.components:
-            component.end()
+            component.physics_update()
 
     def update(self):
         '''if not self.is_enabled():
@@ -55,6 +59,22 @@ class GameObject:
         for component in self.components:
             '''if component.is_enabled():'''
             component.update()
+
+    def animation_update(self):
+        for component in self.components:
+            component.animation_update()
+
+    def late_update(self):
+        for component in self.components:
+            component.late_update()
+
+    def on_will_render_object(self):
+        for component in self.components:
+            component.on_will_render_object()
+
+    def on_destroy(self):
+        for component in self.components:
+            component.on_destroy()
 
     def add_component(self, component_type: Type[ComponentType]) -> ComponentType:
         '''新增並回傳一個組件(Component)，並與此遊戲物件綁定'''
@@ -77,11 +97,11 @@ class GameObject:
 
     def destroy(self):
         '''銷毀此遊戲物件並從場景(Scene)上移除'''
-        SceneManager.current_scene.destroy_gameobject(self)
+        SceneManager.current_scene.destroy(self)
 
     def instantiate(self):
         '''新增此遊戲物件到場景(Scene)上'''
-        SceneManager.current_scene.instantiate_gameobject(self)
+        SceneManager.current_scene.instantiate(self)
 
     '''def dont_destroy_on_load(self):
         SceneManager.dont_destroy_on_load(self)'''

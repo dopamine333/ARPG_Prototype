@@ -47,9 +47,11 @@ class Animator(Component):
             self.add_animation(default_animation)
 
     # endregion
-    def start(self):
-        self.render=self.get_component(Render)
+    def awake(self):
+        self.render = self.get_component(Render)
         self.current_animation = self.default_animation
+
+    def start(self):
         self.current_animation.play()
 
     def add_trigger(self, *parameter_names: str):
@@ -78,7 +80,7 @@ class Animator(Component):
     def set_image(self, image: Image):
         self.render.set_image(image)
 
-    def update(self):
+    def animation_update(self):
         self.current_animation.update()
 
         for trigger_parameter_name in self.trigger_parameters:

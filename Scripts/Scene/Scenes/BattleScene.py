@@ -26,7 +26,7 @@ from Scripts.Graphic.Render.SpriteRender import SpriteRender
 
 
 class BattleScene(Scene):
-    def scene_start(self):
+    def on_load(self):
         # region obstacle
         for _ in range(8):
             size = random()*150+50
@@ -42,7 +42,7 @@ class BattleScene(Scene):
             obstacle_render.set_shadow_size((size, 20))
             obstacle.set_position((random()*1280, 0, random()*1280))
 
-            self.add_gameobject(obstacle)
+            self.instantiate(obstacle)
         # endregion
 
         # region to_mainmenu_button
@@ -60,25 +60,28 @@ class BattleScene(Scene):
 
         to_mainmenu_button_button.get_button_event(ButtonEvent.up) + Time.resume
         to_mainmenu_button_button.get_button_event(ButtonEvent.up) + self.to_mainmenu
-        self.add_gameobject(to_mainmenu_button)
+        self.instantiate(to_mainmenu_button)
         # endregion
-
+        
         # region pause_button
-        #TODO 暫停按鈕動畫
+        # FIXME 暫停按鈕動畫ui動畫 因為時間暫停不能動
         pause_button_source = load(
             r"Arts\UI\Icon\pause_icon.png").convert_alpha()
         pause_button_size = pause_button_source.get_size()
         pause_button = GameObject()
         pause_button_render = pause_button.add_component(Render)
         pause_button_button = pause_button.add_component(SwitchButton)
-        pause_button_render.set_image(Image(pause_button_source))
+        resume_source=Surface(pause_button_size)
+        resume_source.fill((255,100,100))
         pause_button_render.set_layer(Layer.UI)
         pause_button_button.set_button_size(pause_button_size)
         pause_button.set_position((1200, 20, 0))
-
-        pause_button_button.get_switch_button_event(SwitchButtonEvent.close) + Time.pause
-        pause_button_button.get_switch_button_event(SwitchButtonEvent.open) + Time.resume
-        self.add_gameobject(pause_button)
+        pause_button_render.set_image(Image(pause_button_source))
+        pause_button_button.get_switch_button_event(SwitchButtonEvent.close) \
+            + Time.pause + (lambda:pause_button_render.set_image(Image(resume_source)))
+        pause_button_button.get_switch_button_event(SwitchButtonEvent.open) \
+            + Time.resume + (lambda:pause_button_render.set_image(Image(pause_button_source)))
+        self.instantiate(pause_button)
         # endregion
 
         # region camera
@@ -92,7 +95,7 @@ class BattleScene(Scene):
         camera_controller.set_max_follow_distance(15)
         # camera_controller.set_activity_rect(Rect(-500,-500,2000,2000))
         camera_camera.set_shadow_color((10, 10, 50, 50))
-        self.add_gameobject(camera)
+        self.instantiate(camera)
         # endregion
 
         RenderManager.set_camera(camera_camera)
@@ -100,7 +103,7 @@ class BattleScene(Scene):
 
         game_manager_runner = GameObject()
         game_manager_runner.add_component(GameManagerRunner)
-        self.add_gameobject(game_manager_runner)
+        self.instantiate(game_manager_runner)
 
     def scene_update(self):
         MouseManager.update()

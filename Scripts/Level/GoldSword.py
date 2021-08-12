@@ -22,7 +22,7 @@ class GoldSword(UnderAttackInterface):
 
         self.is_triggered = False
 
-    def start(self):
+    def awake(self):
         self.rigidbody = self.get_component(RigidBody)
         self.animator = self.get_component(Animator)
 

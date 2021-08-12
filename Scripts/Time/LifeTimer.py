@@ -1,4 +1,4 @@
-from Scripts.Time.Time import Time
+from Scripts.Time.Invoker import Invoker
 from Scripts.GameObject.Component import Component
 
 
@@ -17,7 +17,11 @@ class LifeTimer(Component):
         self.lifetime = 0
 
     def start(self):
-        Time.invoke(self.destroy, self.lifetime)
+        Invoker.invoke(self.destroy, self.lifetime)
+
+    def on_destroy(self):
+        if Invoker.is_invoking(self.destroy):
+            Invoker.cancel_invoke(self.destroy)
 
     def set_lifetime(self, lifetime: float):
         self.lifetime = lifetime

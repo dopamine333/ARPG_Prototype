@@ -23,8 +23,8 @@ class Render(Component):
 
     def set_layer(self, layer: Layer):
         self.layer = layer
-
-    def update(self):
+        
+    def on_will_render_object(self):
         if self.image and self.layer:
             RenderManager.draw(
                 self.image, self.gameobject.position.xy, self.layer)

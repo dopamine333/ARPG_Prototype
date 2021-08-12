@@ -8,14 +8,14 @@ class GameSystem:
     def __init__(self, gamemanager: GameManager) -> None:
         self.gamemanager = gamemanager
 
-    '''def start(self):
-        pass'''
+    def init(self):
+        pass
 
-    def start_game(self):
+    def start(self):
         pass
 
     def update(self):
         pass
 
-    '''def end(self):
-        pass'''
+    def release(self):
+        pass

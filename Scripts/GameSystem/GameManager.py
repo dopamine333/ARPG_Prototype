@@ -17,26 +17,22 @@ class GameManager(Singleton):
         self.levelsystem = LevelSystem(self)
         self.playersystem = PlayerSystem(self)
         self.enemysystem = EnemySystem(self)
-
-    def start_game(self):
-        self.levelsystem.start_game()
-        self.playersystem.start_game()
-        self.enemysystem.start_game()
-
-    '''def start(self):
+    
+    def init(self):
+        self.levelsystem.init()
+        
+    def start(self):
         self.levelsystem.start()
         self.playersystem.start()
-        self.enemysystem.start()'''
+        self.enemysystem.start()
 
     def update(self):
         self.levelsystem.update()
         self.playersystem.update()
         self.enemysystem.update()
 
-    '''def end(self):
-        self.levelsystem.end()
-        self.playersystem.end()
-        self.enemysystem.end()'''
+    def release(self):
+        self.levelsystem.release()
 
     def generate_enemy(self, enemies: list[tuple[CharacterID, Vector3]]):
         self.enemysystem.generate_enemy(enemies)

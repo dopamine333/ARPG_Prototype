@@ -15,11 +15,17 @@ class LevelSystem(GameSystem):
         self.current_level: Level = None
         self.levels: dict[int, Level] = {}
 
-    def start_game(self):
-        self.current_level.start_level()
+    def init(self):
+        self.current_level.init()
+        
+    def start(self):
+        self.current_level.start()
 
     def update(self):
         self.current_level.update()
+
+    def release(self):
+        self.current_level.release()
 
     def get_spawnpoint(self):
         return self.current_level.current_savepoint.spawnpoint
@@ -28,6 +34,8 @@ class LevelSystem(GameSystem):
         self.gamemanager.generate_enemy(enemies)
 
     def choice_level(self, level_number: int):
+        if level_number not in self.levels:
+            raise Exception(f"LevelSystem: no exist level-{level_number}")
         self.current_level = self.levels[level_number]
 
     def add_level(self, level: Level, level_number: int):

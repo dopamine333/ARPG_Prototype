@@ -11,7 +11,7 @@ from Scripts.Scene.Scenes.Scene import Scene
 
 
 class MainMenuScene(Scene):
-    def scene_start(self):
+    def on_load(self):
 
         play_button_source = load(
             r"Arts\MainMenu\play_button.png").convert_alpha()
@@ -34,10 +34,7 @@ class MainMenuScene(Scene):
 
         play_button_button.get_button_event(ButtonEvent.up) + self.to_battle
 
-        self.add_gameobjects(play_button, game_title)
-
-    def scene_update(self):
-        MouseManager.update()
+        self.instantiate(play_button, game_title)
 
     def to_battle(self):
         # FIXME 選擇關卡

@@ -19,7 +19,7 @@ class PlayerSystem(GameSystem):
         self.player_characterID = CharacterID.hero
         self.alive_player: Character = None
 
-    def start_game(self):
+    def start(self):
         self.spawn_player()
 
     def spawn_player(self):

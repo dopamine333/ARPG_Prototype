@@ -19,7 +19,7 @@ class SavePoint:
 
         self.level: Level = None
 
-    def start(self):
+    def init(self):
         factory = FactoryManager.Instance().get_onlevelgameobjectfactory()
         self.goldsword = factory.create(OnLevelGameObjectID.goldsword)
         self.goldsword.set_savepoint(self)

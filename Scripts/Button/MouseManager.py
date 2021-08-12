@@ -3,11 +3,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.Button.Button import Button
 
-from pygame.cursors import Cursor
 from Scripts.Graphic.Image import Image
-from pygame import Vector2, mouse
+from pygame import mouse
 from Scripts.Locals import ButtonEvent, CursorState
-from Scripts.Tools.Singleton import Singleton
 from pygame.image import load
 
 
@@ -41,20 +39,26 @@ class MouseManager:
     def attach(button: Button):
         '''註冊按鈕(Button)'''
         MouseManager.buttons.append(button)
-        button.get_button_event(ButtonEvent.enter) + MouseManager.mouse_enter_buttom
-        button.get_button_event(ButtonEvent.exit) + MouseManager.mouse_exit_buttom
+        button.get_button_event(ButtonEvent.enter) + \
+            MouseManager.mouse_enter_buttom
+        button.get_button_event(ButtonEvent.exit) + \
+            MouseManager.mouse_exit_buttom
 
     @staticmethod
     def detach(button: Button):
         '''取消註冊按鈕(Button)'''
         if button in MouseManager.buttons:
             MouseManager.buttons.remove(button)
-        button.get_button_event(ButtonEvent.enter) - MouseManager.mouse_enter_buttom
-        button.get_button_event(ButtonEvent.exit) - MouseManager.mouse_exit_buttom
+        button.get_button_event(ButtonEvent.enter) - \
+            MouseManager.mouse_enter_buttom
+        button.get_button_event(ButtonEvent.exit) - \
+            MouseManager.mouse_exit_buttom
 
     @staticmethod
     def update():
         '''觸發按鈕事件'''
+        if len(MouseManager.buttons) == 0:
+            return
         mouse_pos = mouse.get_pos()
         mouse_pressed = mouse.get_pressed()[0]
         for button in MouseManager.buttons:
@@ -73,11 +77,19 @@ class MouseManager:
         # 切換鼠標圖示
         MouseManager.cursor_state = CursorState.button
         image = MouseManager.cursor_images[MouseManager.cursor_state]
-        mouse.set_cursor(image.get_int_center(), image.source)
+        # pygame.error: CreateIconIndirect(): 參數錯誤。 未知但好像沒關西的錯誤
+        try:
+            mouse.set_cursor(image.get_int_center(), image.source)
+        except:
+            print('''pygame.error: CreateIconIndirect(): 參數錯誤。''')
 
     @staticmethod
     def mouse_exit_buttom():
         # 切換鼠標圖示
         MouseManager.cursor_state = CursorState.normal
         image = MouseManager.cursor_images[MouseManager.cursor_state]
-        mouse.set_cursor(image.get_int_center(), image.source)
+        # pygame.error: CreateIconIndirect(): 參數錯誤。 未知但好像沒關西的錯誤
+        try:
+            mouse.set_cursor(image.get_int_center(), image.source)
+        except:
+            print('''pygame.error: CreateIconIndirect(): 參數錯誤。''')

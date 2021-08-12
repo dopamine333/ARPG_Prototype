@@ -55,14 +55,14 @@ class RigidBody(Component):
 
     # endregion
 
-    def start(self):
+    def awake(self):
         Physics.attach(self)
         self.update_surface(Face.all)
 
-    def end(self):
+    def on_destroy(self):
         Physics.detach(self)
-
-    def update(self):
+        
+    def physics_update(self):
         # 更新物理
         if Time.is_paused():
             return

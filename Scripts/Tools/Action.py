@@ -8,11 +8,9 @@ class Action:
         return self
 
     def __sub__(self, func):
-        #FIXME 應該要報錯還是直接不做
-        try:
-            self.funcs.remove(func)
-        except ValueError as e:
-            raise Exception("ActionError: Detach unkwon func , "+str(e))
+        if func not in self.funcs:
+            raise Exception("ActionError: Detach unkwon func.")
+        self.funcs.remove(func)
         return self
 
     def __contains__(self, func):

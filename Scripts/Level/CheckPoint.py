@@ -28,7 +28,7 @@ class Checkpoint:
         self.finish_event: GameEvent = None
 
         self.is_detecting = False
-        #self.is_triggered = False
+        self.is_triggered = False
 
     def detect(self):
         '''開始偵測玩家'''
@@ -36,14 +36,14 @@ class Checkpoint:
 
     def resume(self):
         self.stop_detect()
-
-        # if self.is_triggered:
-
-        EventManager.get(self.finish_event) - self.finish
+        if self.is_triggered:
+            EventManager.get(self.finish_event) - self.finish
+            self.is_triggered=False
 
     def finish(self):
         '''完成一個檢查點'''
         # 解除註冊使該檢查點結束的事件
+        self.is_triggered = False
         EventManager.get(self.finish_event) - self.finish
         # 如果是最後檢查點 通知關卡結束
         if self.is_final_checkpoint():
@@ -84,7 +84,7 @@ class Checkpoint:
 
     def trigger(self):
         '''玩家進入觸發檢查點'''
-        #self.is_triggered = True
+        self.is_triggered = True
         self.level.trigger_checkpoint()
         # 生成怪物
         self.generate_enemy(self.enemies)

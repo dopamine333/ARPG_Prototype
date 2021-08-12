@@ -6,7 +6,7 @@ from Scripts.Character.CharacterBrain.CharacterBrain import CharacterBrain
 
 
 class PlayerController(CharacterBrain):
-    def start(self):
+    def awake(self):
         EventManager.get(InputEvent.move_down) + self.move_down
         EventManager.get(InputEvent.move_up) + self.move_up
         EventManager.get(InputEvent.move_right) + self.move_right
@@ -14,7 +14,7 @@ class PlayerController(CharacterBrain):
         EventManager.get(InputEvent.fire) + self.attack
         EventManager.get(InputEvent.jump) + self.jump
 
-    def end(self):
+    def on_destroy(self):
         EventManager.get(InputEvent.move_down) - self.move_down
         EventManager.get(InputEvent.move_up) - self.move_up
         EventManager.get(InputEvent.move_right) - self.move_right

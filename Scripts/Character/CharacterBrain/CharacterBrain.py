@@ -14,11 +14,14 @@ class CharacterBrain:
     def __init__(self) -> None:
         self.character: Character = None
 
+    def awake(self):
+        pass
+
     def start(self):
         pass
 
     def update(self):
         pass
 
-    def end(self):
+    def on_destroy(self):
         pass

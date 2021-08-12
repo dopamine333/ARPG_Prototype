@@ -47,9 +47,12 @@ class Character(UnderAttackInterface):
         self.brain = brain
         self.brain.character = self
 
-    def start(self):
+    def awake(self):
         self.rigidbody = self.get_component(RigidBody)
         self.rigidbody.on_collide_notify + self.on_collide
+        self.brain.awake()
+
+    def start(self):
         self.hp = self.max_hp
         self.brain.start()
 
@@ -59,8 +62,8 @@ class Character(UnderAttackInterface):
         self.brain.update()
         self.buffer.update()
 
-    def end(self):
-        self.brain.end()
+    def on_destroy(self):
+        self.brain.on_destroy()
 
     def on_collide(self, collision: Collision):
         pass

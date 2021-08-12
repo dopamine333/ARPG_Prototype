@@ -37,10 +37,10 @@ class Button(Component):
         self.button_size = Vector2(button_center)
     # endregion
 
-    def start(self):
+    def awake(self):
         MouseManager.attach(self)
 
-    def end(self):
+    def on_destroy(self):
         if self.mouse_over:
             self.notify(ButtonEvent.exit)
         MouseManager.detach(self)

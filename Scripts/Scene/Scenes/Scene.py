@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Scripts.GameObject.GameObject import GameObject
 from Scripts.Scene.SceneManager import SceneManager
+from Scripts.Time.Invoker import Invoker
 
 
 class Scene:
@@ -17,54 +18,62 @@ class Scene:
         self.to_destroy_gameobjects: list[GameObject] = []
         self.to_instantiate_gameobjects: list[GameObject] = []
 
-    def add_gameobject(self, gameobject: GameObject):
-        self.gameobjects.append(gameobject)
+    def instantiate(self, *gameobjects: GameObject):
+        for gameobject in gameobjects:
+            self.to_instantiate_gameobjects.append(gameobject)
+            gameobject.awake()
 
-    def add_gameobjects(self, *gameobjects: list[GameObject]):
-        self.gameobjects.extend(gameobjects)
+    def is_exist(self, gameobject: GameObject):
+        return gameobject in self.gameobjects and gameobject not in self.to_destroy_gameobjects
 
-    def instantiate_gameobject(self, gameobject: GameObject):
-        self.to_instantiate_gameobjects.append(gameobject)
-        gameobject.start()
-
-    def destroy_gameobject(self, gameobject: GameObject):
-        if gameobject in self.to_destroy_gameobjects or \
-           gameobject not in self.gameobjects:
-            return
+    def destroy(self, gameobject: GameObject):
+        if not self.is_exist(gameobject):
+            raise Exception(f"SceneError: destroy a not exist gameobject")
         self.to_destroy_gameobjects.append(gameobject)
-        gameobject.end()
 
-    def scene_start(self):
-        '''在start前執行'''
+    # region gameloop
+    def on_load(self):
         pass
 
-    def scene_update(self):
-        '''在update前執行'''
-        pass
-
-    def scene_end(self):
-        '''在end後執行'''
-        pass
-
-    def start(self):
-        for gameobject in self.gameobjects:
+    def on_instantiate(self):
+        if len(self.to_instantiate_gameobjects) == 0:
+            return
+        for gameobject in self.to_instantiate_gameobjects:
+            self.gameobjects.append(gameobject)
             gameobject.start()
+        self.to_instantiate_gameobjects.clear()
 
-    def end(self):
+    def physics_update(self):
         for gameobject in self.gameobjects:
-            gameobject.end()
+            gameobject.physics_update()
 
     def update(self):
-        if len(self.to_instantiate_gameobjects) > 0:
-            self.gameobjects.extend(self.to_instantiate_gameobjects)
-            self.to_instantiate_gameobjects.clear()
-
         for gameobject in self.gameobjects:
             gameobject.update()
+        Invoker.trigger()
+        for gameobject in self.gameobjects:
+            gameobject.animation_update()
+        for gameobject in self.gameobjects:
+            gameobject.late_update()
 
-        for del_gameobject in self.to_destroy_gameobjects:
-            self.gameobjects.remove(del_gameobject)
+    def on_will_render_object(self):
+        for gameobject in self.gameobjects:
+            gameobject.on_will_render_object()
+
+    def on_release(self):
+        for gameobject in self.gameobjects:
+            if gameobject not in self.to_destroy_gameobjects:
+                self.to_destroy_gameobjects.append(gameobject)
+
+    def on_destroy(self):
+        if len(self.to_destroy_gameobjects) == 0:
+            return
+        for gameobject in self.to_destroy_gameobjects:
+            self.gameobjects.remove(gameobject)
+            gameobject.on_destroy()
         self.to_destroy_gameobjects.clear()
 
+    # endregion
+
     def change_scene(self, new_scene_name: type[Scene]):
-        SceneManager.change(new_scene_name())
+        SceneManager.change_scene(new_scene_name())

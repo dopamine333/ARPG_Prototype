@@ -1,3 +1,4 @@
+from pygame.transform import rotozoom
 from Scripts.Attack.UnderAttackInterface import UnderAttackInterface
 from Scripts.Attack.AttackParam import AttackParam
 
@@ -39,7 +40,9 @@ class Hero(Character):
         # TODO 完成武器類別
         self.sword_damage = 3
         self.sword_force = Vector3(1000, 1200, 0)
-        self.sword_flash_image = Image(sword_flash_source, Vector2(45, 44))
+        self.sword_flash_image1 = Image(sword_flash_source, Vector2(45, 44))
+        self.sword_flash_image2 = Image(rotozoom(sword_flash_source,0,1.3), Vector2(58.5, 57.2))
+        self.sword_flash_image3 = Image(rotozoom(sword_flash_source,0,1.6), Vector2(72, 70.4))
         self.sword_flash_box_size = Vector3(100, 60, 100)
         self.sword_flash_offset = Vector3(100, 60, 0)
 
@@ -62,8 +65,8 @@ class Hero(Character):
 
     # region override Character
 
-    def start(self):
-        super().start()
+    def awake(self):
+        super().awake()
         self.animator = self.get_component(Animator)
         self.render = self.get_component(SpriteRender)
         self.rigidbody.set_damp(0.92)
@@ -174,15 +177,15 @@ class Hero(Character):
     def combo_attack_1(self):
 
         damage = 1
-        force = Vector3(1000, 1200, 100)
-        size = Vector3(100, 60, 100)
+        force = Vector3(400, 1500, 0)
+        size = Vector3(150, 60, 200)
         offset = Vector3(100, 60, 0)
         self.do_attack(size,offset,damage,force)
 
         if self.is_face_left():
-            image=self.sword_flash_image.flip(True,False)
+            image=self.sword_flash_image1.flip(True,False)
         else:
-            image=self.sword_flash_image
+            image=self.sword_flash_image1
 
         RenderManager.camera.draw(image, self.position+offset)
 
@@ -192,9 +195,9 @@ class Hero(Character):
     
     def combo_attack_2(self):
 
-        damage = 2
-        force = Vector3(1000, 1200, -200)
-        size = Vector3(120, 70, 120)
+        damage = 1
+        force = Vector3(600, 1800, 0)
+        size = Vector3(180, 70, 240)
         offset = Vector3(120, 60, 0)
         self.do_attack(size,offset,damage,force)
         surface=Surface(size.xy)
@@ -202,9 +205,9 @@ class Hero(Character):
 
 
         if self.is_face_left():
-            image=self.sword_flash_image.flip(True,False)
+            image=self.sword_flash_image2.flip(True,False)
         else:
-            image=self.sword_flash_image
+            image=self.sword_flash_image2
 
         RenderManager.camera.draw(image, self.position+offset)
 
@@ -213,9 +216,9 @@ class Hero(Character):
     
     def combo_attack_3(self):
 
-        damage = 5
-        force = Vector3(500, 2500, 0)
-        size = Vector3(150, 100, 150)
+        damage = 2
+        force = Vector3(600, 2700, 0)
+        size = Vector3(250, 200, 350)
         offset = Vector3(150, 60, 0)
         self.do_attack(size,offset,damage,force)
         surface=Surface(size.xy)
@@ -223,9 +226,9 @@ class Hero(Character):
 
 
         if self.is_face_left():
-            image=self.sword_flash_image.flip(True,False)
+            image=self.sword_flash_image3.flip(True,False)
         else:
-            image=self.sword_flash_image
+            image=self.sword_flash_image3
 
         RenderManager.camera.draw(image, self.position+offset)
 

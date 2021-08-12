@@ -28,8 +28,10 @@ class CameraController(Component):
         self.activity_rect: Rect = None
     
 
-    def start(self):
+    def awake(self):
         self.camera = self.get_component(Camera)
+        
+    def start(self):
         if self.target:
             self.position.xyz = self.target+self.offset
     # region setter
@@ -57,7 +59,7 @@ class CameraController(Component):
         self.follow_axis = (x, y, z)
     # endregion        
 
-    def update(self):
+    def late_update(self):
         if self.target:
             to=self.target+self.offset-self.position
             if not self.follow_axis[0]:

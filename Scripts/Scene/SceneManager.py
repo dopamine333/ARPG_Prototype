@@ -14,26 +14,46 @@ class SceneManager:
     呼叫當前場景更新
     '''
     current_scene: Scene = None
-    #dont_destroy_on_load_gameobjects: list[GameObject] = []
+    to_load_scene: Scene = None
+
+    @staticmethod
+    def change_scene(new_scene: Scene):
+        SceneManager.to_load_scene = new_scene
+
+    @staticmethod
+    def initialization():
+        if not SceneManager.current_scene:
+            return
+        SceneManager.current_scene.on_instantiate()
+
+    @staticmethod
+    def physics():
+        if not SceneManager.current_scene:
+            return
+        SceneManager.current_scene.physics_update()
 
     @staticmethod
     def update():
-        if SceneManager.current_scene:
-            SceneManager.current_scene.scene_update()
-            SceneManager.current_scene.update()
+        if not SceneManager.current_scene:
+            return
+        SceneManager.current_scene.update()
 
     @staticmethod
-    def change(new_scene: Scene):
-        if SceneManager.current_scene:
-            SceneManager.current_scene.end()
-            SceneManager.current_scene.scene_end()
-            '''new_scene.add_gameobjects(
-                *[gameobject
-                  for gameobject in SceneManager.current_scene.gameobjects
-                  if gameobject in SceneManager.dont_destroy_on_load_gameobjects])'''
-        SceneManager.current_scene = new_scene
-        SceneManager.current_scene.scene_start()
-        SceneManager.current_scene.start()
+    def rendering():
+        if not SceneManager.current_scene:
+            return
+        SceneManager.current_scene.on_will_render_object()
 
-    '''def dont_destroy_on_load(gameobject: GameObject):
-        SceneManager.dont_destroy_on_load_gameobjects.append(gameobject)'''
+    @staticmethod
+    def decommissioning():
+        if SceneManager.current_scene:
+            
+            if SceneManager.to_load_scene:
+                SceneManager.current_scene.on_release()
+
+            SceneManager.current_scene.on_destroy()
+
+        if SceneManager.to_load_scene:
+            SceneManager.current_scene = SceneManager.to_load_scene
+            SceneManager.to_load_scene = None
+            SceneManager.current_scene.on_load()
