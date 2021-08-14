@@ -17,7 +17,7 @@ class Slime(Character):
 
     def __init__(self) -> None:
         super().__init__()
-        self.max_hp = 5
+        self.max_hp = 10
         self.invincible_time = 0
 
         self.jump_force = 2800
@@ -32,13 +32,13 @@ class Slime(Character):
         self.collide_damage = 2
 
         self.jump_VFXID = VFXID.slime_jump
-        self.landing_VFXID = VFXID.slime_landing
+        self.land_VFXID = VFXID.slime_land
         self.attack_VFXID = VFXID.slime_attack
         self.underattack_VFXID = VFXID.slime_underattack
         self.dead_VFXID = VFXID.slime_dead
 
         self.jump_SFXID = SFXID.slime_jump
-        self.landing_SFXID = SFXID.slime_landing
+        self.land_SFXID = SFXID.slime_land
         # self.attack_SFXID=SFXID.slime_attack
         self.underattack_SFXID = SFXID.slime_underattack
         self.dead_SFXID = SFXID.slime_dead
@@ -105,7 +105,7 @@ class Slime(Character):
     def on_collide(self, collision: Collision):
         if collision.face is Face.down:
             if not self.buffer.get("on_ground"):
-                self.on_landing()
+                self.on_land()
             self.buffer.set(
                 "on_ground", self.can_jump_since_exit_ground_time)
         if not collision.gameobject:
@@ -115,9 +115,9 @@ class Slime(Character):
                 self.attack(collision.gameobject.get_component(
                     UnderAttackInterface))
 
-    def on_landing(self):
-        self.play_VFX(self.landing_VFXID, self.get_bottom())
-        self.play_SFX(self.landing_SFXID)
+    def on_land(self):
+        self.play_VFX(self.land_VFXID, self.get_bottom())
+        self.play_SFX(self.land_SFXID)
         self.buffer.set(
             "on_ground", self.can_jump_since_exit_ground_time)
 

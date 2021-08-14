@@ -21,13 +21,13 @@ class AudioManger(Singleton):
         self.sfxs[SFXID.hero_attack] = self.load_SFX("hero_attack")
         self.sfxs[SFXID.hero_move] = self.load_SFX("hero_move", 11)
         self.sfxs[SFXID.hero_jump] = self.load_SFX("hero_jump")
-        self.sfxs[SFXID.hero_landing] = self.load_SFX("hero_landing")
+        self.sfxs[SFXID.hero_land] = self.load_SFX("hero_land")
         self.sfxs[SFXID.hero_underattack] = self.load_SFX("hero_underattack", 8)
         self.sfxs[SFXID.hero_dead] = self.load_SFX("hero_dead", 5)
         
         self.set_path("Audios\SoundEffect\Character\Slime")
         self.sfxs[SFXID.slime_jump] = self.load_SFX("slime_jump")
-        self.sfxs[SFXID.slime_landing] = self.load_SFX("slime_landing")
+        self.sfxs[SFXID.slime_land] = self.load_SFX("slime_land")
         self.sfxs[SFXID.slime_underattack] = self.load_SFX("slime_underattack")
         self.sfxs[SFXID.slime_dead] = self.load_SFX("slime_dead")
 

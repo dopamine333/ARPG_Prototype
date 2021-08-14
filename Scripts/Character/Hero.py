@@ -28,7 +28,7 @@ class Hero(Character):
 
         sword_flash_source = load(
             r"Arts\Character\sword_flash.png").convert_alpha()
-        self.max_hp = 10
+        self.max_hp = 20
         self.jump_force = 2500
         self.dash_force = 1000
         self.move_speed = 1728
@@ -48,14 +48,14 @@ class Hero(Character):
 
         self.jump_VFXID = VFXID.hero_jump
         self.move_VFXID = VFXID.hero_move
-        self.landing_VFXID = VFXID.hero_landing
+        self.land_VFXID = VFXID.hero_land
         self.attack_VFXID = VFXID.hero_attack
         self.underattack_VFXID = VFXID.hero_underattack
         self.dead_VFXID = VFXID.hero_dead
 
         self.jump_SFXID = SFXID.hero_jump
         self.move_SFXID = SFXID.hero_move
-        self.landing_SFXID = SFXID.hero_landing
+        self.land_SFXID = SFXID.hero_land
         self.attack_SFXID = SFXID.hero_attack
         self.underattack_SFXID = SFXID.hero_underattack
         self.dead_SFXID = SFXID.hero_dead
@@ -93,7 +93,7 @@ class Hero(Character):
         # 如果下方碰撞
         if collision.face is Face.down:
             if not self.is_on_ground():
-                self.on_landing()
+                self.on_land()
             self.on_ground()
 
     def dead(self):
@@ -112,6 +112,7 @@ class Hero(Character):
                                          (random()-0.5)*self.rigidbody.collider.get_size().z)
         self.play_VFX(self.underattack_VFXID, position)
         self.play_SFX(self.underattack_SFXID)
+        self.animator.set_trigger("underattack")
 
     # endregion
 
@@ -125,9 +126,9 @@ class Hero(Character):
     def on_ground(self):
         self.buffer.set("on_ground", self.can_jump_since_exit_ground_time)
 
-    def on_landing(self):
-        self.play_VFX(self.landing_VFXID, self.get_bottom())
-        self.play_SFX(self.landing_SFXID)
+    def on_land(self):
+        self.play_VFX(self.land_VFXID, self.get_bottom())
+        self.play_SFX(self.land_SFXID)
 
     def do_jump(self):
         self.play_VFX(self.jump_VFXID,  self.get_bottom())
@@ -177,62 +178,41 @@ class Hero(Character):
     def combo_attack_1(self):
 
         damage = 1
-        force = Vector3(400, 1500, 0)
-        size = Vector3(150, 60, 200)
+        force = Vector3(500, 1200, 0)
+        size = Vector3(150, 60, 500)
         offset = Vector3(100, 60, 0)
         self.do_attack(size,offset,damage,force)
 
-        if self.is_face_left():
-            image=self.sword_flash_image1.flip(True,False)
-        else:
-            image=self.sword_flash_image1
-
-        RenderManager.camera.draw(image, self.position+offset)
-
-        #self.play_VFX(self.attack_VFXID, self.position+offset)
         self.play_SFX(self.attack_SFXID)
 
     
     def combo_attack_2(self):
 
         damage = 1
-        force = Vector3(600, 1800, 0)
-        size = Vector3(180, 70, 240)
+        force = Vector3(700, 1500, 0)
+        size = Vector3(300, 300, 200)
         offset = Vector3(120, 60, 0)
         self.do_attack(size,offset,damage,force)
-        surface=Surface(size.xy)
-        surface.fill((150,150,0))
 
-
-        if self.is_face_left():
-            image=self.sword_flash_image2.flip(True,False)
-        else:
-            image=self.sword_flash_image2
-
-        RenderManager.camera.draw(image, self.position+offset)
-
-        #self.play_VFX(self.attack_VFXID, self.position+offset)
         self.play_SFX(self.attack_SFXID)
     
     def combo_attack_3(self):
 
         damage = 2
-        force = Vector3(600, 2700, 0)
-        size = Vector3(250, 200, 350)
+        force = Vector3(700, 2800, 0)
+        size = Vector3(300, 500, 200)
         offset = Vector3(150, 60, 0)
         self.do_attack(size,offset,damage,force)
-        surface=Surface(size.xy)
-        surface.fill((150,150,150))
 
+        self.play_SFX(self.attack_SFXID)
 
-        if self.is_face_left():
-            image=self.sword_flash_image3.flip(True,False)
-        else:
-            image=self.sword_flash_image3
+    def air_attack(self):
+        damage = 2
+        force = Vector3(1000, -4500, 0)
+        size = Vector3(400, 400, 200)
+        offset = Vector3(150, 60, 0)
+        self.do_attack(size,offset,damage,force)
 
-        RenderManager.camera.draw(image, self.position+offset)
-
-        #self.play_VFX(self.attack_VFXID, self.position+offset)
         self.play_SFX(self.attack_SFXID)
 
     def play_move_VFX_and_SFX(self):

@@ -30,13 +30,13 @@ class VFXManager(Singleton):
             VFXID.hero_move: choice(["Clip", "Clop"]),
             VFXID.hero_underattack: "OUCH!",
             VFXID.hero_dead: "AHHHHHHHHHHH",
-            VFXID.hero_landing: "Thud",
+            VFXID.hero_land: "Thud",
 
             VFXID.slime_attack: "PA",
             VFXID.slime_jump: "DUANG",
             VFXID.slime_underattack: "DRIP",
             VFXID.slime_dead: "POP",
-            VFXID.slime_landing: "Fizz",
+            VFXID.slime_land: "Fizz",
 
             VFXID.finish_level: "YOU WIN!",
             VFXID.finish_checkpoint: "Clear Checkpoint!",
@@ -82,7 +82,7 @@ class VFXManager(Singleton):
             VFXID.slime_jump: DARKBREEN,
             VFXID.slime_underattack: DARKBREEN,
             VFXID.slime_dead: BREEN,
-            VFXID.slime_landing: DARKBREEN,
+            VFXID.slime_land: DARKBREEN,
 
             VFXID.finish_checkpoint: WEITH,
             VFXID.trigger_savepoint: WEITH,

@@ -26,14 +26,74 @@ class CharacterFactory:
     def __init__(self) -> None:
         # TODO 更好的動畫載入方式
         self.hero_animation_clips: dict[str, list[Image]] = {}
-        for act in ["Dead", "Idle", "Jump", "Run"]:
+
+        acts_and_center:dict[str,dict]={
+            "air_attack":{
+                1:(233,263),
+                2:(233,263),
+                3:(174,222),
+                -1:(155,216)
+            },
+            "combo_attack1":{
+                -1:(51,126),
+            },
+            "combo_attack2":{
+                 0:(148,274),
+                 -1:(220,266)
+            },
+            "combo_attack3":{
+                -1:(47,422),
+                },
+            "dead":{
+                -1:(206,210),
+            },
+            "fall":{
+                -1:(90,183),
+
+            },
+            "idle":{
+                -1:(34,118),
+                },
+            "jump":{
+                0:(107,257),
+                1:(103,245),
+                2:(98,139),
+                -1:(107,145)
+                },
+            "land":{
+                -1:(44,164),
+            },
+            "run":{
+                -1:(56,180)},
+            "underattack":{
+                -1:(128,199),
+            }
+        }
+        
+
+        for act,frame_center in acts_and_center.items():
+            clip=[]
+            i=0
+            while True:
+                try:
+                    source=load(f"Arts\Character\hero\{act}\hero_{act}{str(i).zfill(2)}.png").convert_alpha()
+                    image=Image(source,frame_center.get(i,frame_center[-1]))
+                    clip.append(image)
+                except:
+                    print(act,i)
+                    break
+                i+=1
+            self.hero_animation_clips[act]=clip
+
+
+        '''for act in ["dead", "idle", "jump", "run"]:
             clip = []
             for i in range(1, 16):
                 clip.append(Image(
                     scale(load(f"Arts\Character\hero\{act} ({i}).png"), (150, 150)).convert_alpha(), (30, 140)))
             self.hero_animation_clips[act] = clip
         
-        for combo_attack in ["ComboAttack1","ComboAttack2","ComboAttack3"]:
+        for combo_attack in ["combo_attack1","combo_attack2","combo_attack3"]:
             clip=[]
             for i in range(5):
                 f = font.SysFont(font.get_default_font(),(-abs(i-2)+3)*20)
@@ -43,7 +103,7 @@ class CharacterFactory:
                 source.blit(body,(55,30))
                 source.blit(f.render(combo_attack[-1],True,(255,255,255)),(70,50))
                 clip.append(Image(source,(75,150)))
-            self.hero_animation_clips[combo_attack] = clip
+            self.hero_animation_clips[combo_attack] = clip'''
             
 
 
@@ -87,11 +147,11 @@ class CharacterFactory:
             for act, clip in self.hero_animation_clips.items():
                 ani[act] = Animation()
                 ani[act].set_clip(clip)
-                ani[act].set_speed(0.5)
-                if act in ["ComboAttack1","ComboAttack2","ComboAttack3"]:
-                    ani[act].set_speed(0.2)
+                ani[act].set_speed(0.35)
+                '''if act in ["combo_attack1","combo_attack2","combo_attack3"]:
+                    ani[act].set_speed(0.2)'''
 
-            ani["Dead"].set_speed(0.1)
+            ani["dead"].set_speed(0.1)
             gameobject = GameObject()
             hero = gameobject.add_component(Hero)
             rigidbody = gameobject.add_component(RigidBody)
@@ -99,59 +159,72 @@ class CharacterFactory:
             animator = gameobject.add_component(Animator)
             
             animator.add_animations(*ani.values())
-            animator.set_default_animation(ani["Idle"])
+            animator.set_default_animation(ani["idle"])
 
-            #["Dead", "Idle", "Jump", "Run"]
-            animator.add_bool("running", "on_ground", "dead")
-            ani["Idle"].set_play_mode(PlayMode.loop)
-            ani["Run"].set_play_mode(PlayMode.loop)
+            #["dead", "idle", "jump", "run"]
+            animator.add_bool("running", "on_ground", "dead","complete_attack")
+            animator.add_trigger("attack","underattack")
+            ani["idle"].set_play_mode(PlayMode.loop)
+            ani["run"].set_play_mode(PlayMode.loop)
+            ani["fall"].set_play_mode(PlayMode.loop)
 
-            ani["Idle"].add_transition(ani["Run"], False, ("running", True))
-            ani["Idle"].add_transition(ani["Jump"], False, ("on_ground", False))
-            ani["Jump"].add_transition(ani["Idle"], False, ("on_ground", True))
-            ani["Run"].add_transition(ani["Idle"], False, ("running", False))
-            ani["Run"].add_transition(ani["Jump"], False, ("on_ground", False))
-            ani["Idle"].add_transition(ani["Dead"], False, ("dead", True))
-            ani["Jump"].add_transition(ani["Dead"], False, ("dead", True))
-            ani["Run"].add_transition(ani["Dead"], False, ("dead", True))
+            ani["idle"].add_transition(ani["run"], False, ("running", True))
+            ani["idle"].add_transition(ani["jump"], False, ("on_ground", False))
 
-            ani["Dead"].get_frame_event(14) + gameobject.destroy
+            ani["jump"].add_transition(ani["fall"],True)
+            ani["fall"].add_transition(ani["land"],False,("on_ground",True))
+            ani["land"].add_transition(ani["idle"], True)
+
+            ani["jump"].add_transition(ani["air_attack"],False,("attack",True))
+            ani["air_attack"].add_transition(ani["fall"],True)
+
+            ani["run"].add_transition(ani["idle"], False, ("running", False))
+            ani["run"].add_transition(ani["jump"], False, ("on_ground", False))
+
+            ani["underattack"].add_transition(ani["idle"],True)
+
+            ani["dead"].get_frame_event(14) + gameobject.destroy
             # TODO 註冊動畫事件應該在Character裡 還是在工廠裡
-            ani["Run"].get_frame_event(0) + hero.play_move_VFX_and_SFX
-            ani["Run"].get_frame_event(8) + hero.play_move_VFX_and_SFX
+            ani["run"].get_frame_event(0) + hero.play_move_VFX_and_SFX
+            ani["run"].get_frame_event(4) + hero.play_move_VFX_and_SFX
 
-            #["ComboAttack1","ComboAttack2","ComboAttack3"]
-            animator.add_trigger("attack")
-            animator.add_bool("complete_attack")
-            ani["Idle"].add_transition(ani["ComboAttack1"],False,("attack",True))
-            ani["Run"].add_transition(ani["ComboAttack1"],False,("attack",True))
+            #["combo_attack1","combo_attack2","combo_attack3"]
 
-            ani["ComboAttack1"].add_transition(ani["Jump"], False, ("on_ground", False))
-            ani["ComboAttack2"].add_transition(ani["Jump"], False, ("on_ground", False))
-            ani["ComboAttack3"].add_transition(ani["Jump"], False, ("on_ground", False))
+            ani["idle"].add_transition(ani["combo_attack1"],False,("attack",True))
+            ani["run"].add_transition(ani["combo_attack1"],False,("attack",True))
+            ani["underattack"].add_transition(ani["combo_attack1"],False,("attack",True))
 
-            ani["ComboAttack1"].add_transition(ani["Idle"], True, ("on_ground", True))
-            ani["ComboAttack2"].add_transition(ani["Idle"], True, ("on_ground", True))
-            ani["ComboAttack3"].add_transition(ani["Idle"], True, ("on_ground", True))
+            ani["combo_attack1"].add_transition(ani["jump"], False, ("on_ground", False))
+            ani["combo_attack2"].add_transition(ani["jump"], False, ("on_ground", False))
+            ani["combo_attack3"].add_transition(ani["jump"], False, ("on_ground", False))
 
-            ani["ComboAttack1"].add_transition(ani["Dead"], False, ("dead", True))
-            ani["ComboAttack2"].add_transition(ani["Dead"], False, ("dead", True))
-            ani["ComboAttack3"].add_transition(ani["Dead"], False, ("dead", True))
+            ani["combo_attack1"].add_transition(ani["idle"], True, ("on_ground", True))
+            ani["combo_attack2"].add_transition(ani["idle"], True, ("on_ground", True))
+            ani["combo_attack3"].add_transition(ani["idle"], True, ("on_ground", True))
 
-            ani["ComboAttack1"].add_transition(ani["ComboAttack2"],False,("attack",True),("complete_attack",True))
-            ani["ComboAttack2"].add_transition(ani["ComboAttack3"],False,("attack",True),("complete_attack",True))
-            ani["ComboAttack3"].add_transition(ani["Idle"],True)
+
+            ani["combo_attack1"].add_transition(ani["combo_attack2"],False,("attack",True),("complete_attack",True))
+            ani["combo_attack2"].add_transition(ani["combo_attack3"],False,("attack",True),("complete_attack",True))
+            ani["combo_attack3"].add_transition(ani["idle"],True)
 
             complete_attack=lambda:animator.set_bool("complete_attack",True)
             new_attack=lambda:animator.set_bool("complete_attack",False)
 
-            ani["ComboAttack1"].get_frame_event(1) + hero.combo_attack_1 + complete_attack
-            ani["ComboAttack2"].get_frame_event(1) + hero.combo_attack_2 + complete_attack
-            ani["ComboAttack3"].get_frame_event(1) + hero.combo_attack_3 + complete_attack
+            ani["combo_attack1"].get_frame_event(1) + hero.combo_attack_1 + complete_attack
+            ani["combo_attack2"].get_frame_event(1) + hero.combo_attack_2 + complete_attack
+            ani["combo_attack3"].get_frame_event(1) + hero.combo_attack_3 + complete_attack
+            ani["air_attack"].get_frame_event(2) + hero.air_attack
 
-            ani["ComboAttack1"].get_frame_event(0) + new_attack
-            ani["ComboAttack2"].get_frame_event(0) + new_attack
-            ani["ComboAttack3"].get_frame_event(0) + new_attack
+            ani["combo_attack1"].get_frame_event(0) + new_attack
+            ani["combo_attack2"].get_frame_event(0) + new_attack
+            ani["combo_attack3"].get_frame_event(0) + new_attack
+
+
+            for animation in ani.values():
+                if animation==ani["dead"]:
+                    continue
+                animation.add_transition(ani["dead"], False, ("dead", True))
+                animation.add_transition(ani["underattack"],False,("underattack",True))
 
             rigidbody.set_collider((40, 120, 40), (20, 0, 20))
             hero.set_brain(PlayerController())
